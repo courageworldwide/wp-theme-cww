@@ -9,7 +9,7 @@
 /********************************************************************************/
 // Load third-party services
 require_once 'config.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/anet_php_sdk/AuthorizeNet.php'; // Authorize.net SDK
+require_once $_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/authorizenet/AuthorizeNet.php'; // Authorize.net SDK
 require_once $_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/highrise/CwwHighriseInterface.class.php'; // Highrise interface
 require_once $_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/mailchimp/MailchimpCww.php'; // Mailchimp interface
 // Set org vars

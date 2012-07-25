@@ -2,76 +2,124 @@
 /****************************************************************
  * Functions for the Courage Worldwide theme.
  ****************************************************************/
- /**
- * Include the TGM_Plugin_Activation class.
- */
-require_once dirname( __FILE__ ) . '/library/tgm-plugin-activation/class-tgm-plugin-activation.php';
 
-add_action( 'tgmpa_register', 'cww_register_required_plugins' );
+add_action( 'admin_init', 'cww_df_options_init' );
+add_action( 'admin_menu', 'cww_df_options_add_page' );
 
-/**
- * Register the required plugins for this theme.
- * This function is hooked into tgmpa_init, which is fired within the
- * TGM_Plugin_Activation class constructor.
- */
-function cww_register_required_plugins() {
+function cww_df_options_add_page() {
+	// May want to require a more advanced 'capability' to make these changes.
+	add_theme_page( __( 'Donate form options', 'cww' ), __( 'Donate form', 'cww' ), 'edit_theme_options', 'cww_df_options', 'cww_df_options_callback' );
+} 
 
-	/**
-	 * Array of plugin arrays. Required keys are name and slug.
-	 * If the source is NOT from the .org repo, then source is also required.
-	 */
-	$plugins = array(
-		// Include a plugin from the WordPress Plugin Repository
-		array(
-			'name' 		=> 'Types - Complete Solution for Custom Fields and Types',
-			'slug' 		=> 'types',
-			'required' 	=> false,
-		),
-
-	);
-
-	// Change this to your theme text domain, used for internationalising strings
-	$theme_text_domain = 'cww';
-
-	/**
-	 * Array of configuration settings. Amend each line as needed.
-	 * If you want the default strings to be available under your own theme domain,
-	 * leave the strings uncommented.
-	 * Some of the strings are added into a sprintf, so see the comments at the
-	 * end of each line for what each argument will be.
-	 */
-	$config = array(
-		'domain'       		=> $theme_text_domain,         	// Text domain - likely want to be the same as your theme.
-		'default_path' 		=> '',                         	// Default absolute path to pre-packaged plugins
-		'parent_menu_slug' 	=> 'themes.php', 				// Default parent menu slug
-		'parent_url_slug' 	=> 'themes.php', 				// Default parent URL slug
-		'menu'         		=> 'install-required-plugins', 	// Menu slug
-		'has_notices'      	=> true,                       	// Show admin notices or not
-		'is_automatic'    	=> false,					   	// Automatically activate plugins after installation or not
-		'message' 			=> '',							// Message to output right before the plugins table
-		'strings'      		=> array(
-			'page_title'                       			=> __( 'Install Required Plugins', $theme_text_domain ),
-			'menu_title'                       			=> __( 'Install Plugins', $theme_text_domain ),
-			'installing'                       			=> __( 'Installing Plugin: %s', $theme_text_domain ), // %1$s = plugin name
-			'oops'                             			=> __( 'Something went wrong with the plugin API.', $theme_text_domain ),
-			'notice_can_install_required'     			=> _n_noop( 'This theme requires the following plugin: %1$s.', 'This theme requires the following plugins: %1$s.' ), // %1$s = plugin name(s)
-			'notice_can_install_recommended'			=> _n_noop( 'This theme recommends the following plugin: %1$s.', 'This theme recommends the following plugins: %1$s.' ), // %1$s = plugin name(s)
-			'notice_cannot_install'  					=> _n_noop( 'Sorry, but you do not have the correct permissions to install the %s plugin. Contact the administrator of this site for help on getting the plugin installed.', 'Sorry, but you do not have the correct permissions to install the %s plugins. Contact the administrator of this site for help on getting the plugins installed.' ), // %1$s = plugin name(s)
-			'notice_can_activate_required'    			=> _n_noop( 'The following required plugin is currently inactive: %1$s.', 'The following required plugins are currently inactive: %1$s.' ), // %1$s = plugin name(s)
-			'notice_can_activate_recommended'			=> _n_noop( 'The following recommended plugin is currently inactive: %1$s.', 'The following recommended plugins are currently inactive: %1$s.' ), // %1$s = plugin name(s)
-			'notice_cannot_activate' 					=> _n_noop( 'Sorry, but you do not have the correct permissions to activate the %s plugin. Contact the administrator of this site for help on getting the plugin activated.', 'Sorry, but you do not have the correct permissions to activate the %s plugins. Contact the administrator of this site for help on getting the plugins activated.' ), // %1$s = plugin name(s)
-			'notice_ask_to_update' 						=> _n_noop( 'The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s.', 'The following plugins need to be updated to their latest version to ensure maximum compatibility with this theme: %1$s.' ), // %1$s = plugin name(s)
-			'notice_cannot_update' 						=> _n_noop( 'Sorry, but you do not have the correct permissions to update the %s plugin. Contact the administrator of this site for help on getting the plugin updated.', 'Sorry, but you do not have the correct permissions to update the %s plugins. Contact the administrator of this site for help on getting the plugins updated.' ), // %1$s = plugin name(s)
-			'install_link' 					  			=> _n_noop( 'Begin installing plugin', 'Begin installing plugins' ),
-			'activate_link' 				  			=> _n_noop( 'Activate installed plugin', 'Activate installed plugins' ),
-			'return'                           			=> __( 'Return to Required Plugins Installer', $theme_text_domain ),
-			'plugin_activated'                 			=> __( 'Plugin activated successfully.', $theme_text_domain ),
-			'complete' 									=> __( 'All plugins installed and activated successfully. %s', $theme_text_domain ), // %1$s = dashboard link
-			'nag_type'									=> 'updated' // Determines admin notice type - can only be 'updated' or 'error'
-		)
-	);
-	tgmpa( $plugins, $config );
-}
+function cww_df_options_init(){
+	// Authorize.net
+	add_settings_section('cww_df_authorizenet_setting_section',
+						 'Authorize.net',
+						 'cww_df_authorizenet_setting_section_callback',
+						 'cww_df_options');
+	// - API login ID
+	add_settings_field('cww_df_authorizenet_setting_api_login_id',
+					   'API login ID',
+					   'cww_df_authorizenet_setting_api_login_id_callback',
+					   'cww_df_options',
+					   'cww_df_authorizenet_setting_section');
+	register_setting('cww_df_options', 'cww_df_authorizenet_setting_api_login_id');
+	// - Transaction Key
+	add_settings_field('cww_df_authorizenet_setting_transaction_key',
+					   'Transaction key',
+					   'cww_df_authorizenet_setting_transaction_key_callback',
+					   'cww_df_options',
+					   'cww_df_authorizenet_setting_section');
+	register_setting('cww_df_options', 'cww_df_authorizenet_setting_transaction_key');
+	// Mailchimp
+	add_settings_section('cww_df_mailchimp_setting_section',
+						 'Mailchimp',
+						 'cww_df_mailchimp_setting_section_callback',
+						 'cww_df_options');
+	// - API Token
+	add_settings_field('cww_df_mailchimp_setting_api_token',
+					   'API token',
+					   'cww_df_mailchimp_setting_api_token_callback',
+					   'cww_df_options',
+					   'cww_df_mailchimp_setting_section');
+	register_setting('cww_df_options', 'cww_df_mailchimp_setting_api_token');
+	// Highrise
+	add_settings_section('cww_df_highrise_setting_section',
+						 'Highrise',
+						 'cww_df_highrise_setting_section_callback',
+						 'cww_df_options');
+	// - Account
+	add_settings_field('cww_df_highrise_setting_account',
+					   'Account',
+					   'cww_df_highrise_setting_account_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_account');				  
+	// - API Token
+	add_settings_field('cww_df_highrise_setting_api_token',
+					   'API token',
+					   'cww_df_highrise_setting_api_token_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_api_token');
+	// - Admin ID
+	add_settings_field('cww_df_highrise_setting_admin_user_id',
+					   'Administrator ID',
+					   'cww_df_highrise_setting_admin_user_id_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_admin_user_id');
+	// - Admin group ID
+	add_settings_field('cww_df_highrise_setting_admin_group_id',
+					   'Administrator group ID',
+					   'cww_df_highrise_setting_admin_group_id_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_admin_group_id');
+	// - Deals admin ID
+	add_settings_field('cww_df_highrise_setting_deals_admin_user_id',
+					   'Deals administrator ID',
+					   'cww_df_highrise_setting_deals_admin_user_id_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_deals_admin_user_id');
+	// - Deal reminder-task delay
+	add_settings_field('cww_df_highrise_setting_task_delay',
+					   'Deal reminder-task delay',
+					   'cww_df_highrise_setting_task_delay_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_task_delay');
+	// - Category for onetime donations
+	add_settings_field('cww_df_highrise_setting_onetime_category_id',
+					   'Deals category for one time donations.',
+					   'cww_df_highrise_setting_onetime_category_id_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_onetime_category_id');
+	// - Category for monthly donations
+	add_settings_field('cww_df_highrise_setting_monthly_category_id',
+					   'Deals category for monthly donations.',
+					   'cww_df_highrise_setting_monthly_category_id_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_monthly_category_id');
+	// - Category for annual donations
+	add_settings_field('cww_df_highrise_setting_annual_category_id',
+					   'Deals category for annual donations.',
+					   'cww_df_highrise_setting_annual_category_id_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_annual_category_id');
+	// - Category for business donations
+	add_settings_field('cww_df_highrise_setting_business_category_id',
+					   'Deals category for annual donations.',
+					   'cww_df_highrise_setting_business_category_id_callback',
+					   'cww_df_options',
+					   'cww_df_highrise_setting_section');
+	register_setting('cww_df_options', 'cww_df_highrise_setting_business_category_id');
+	
+} 
 
 function cww_scripts() {
 	// Build dependency array for donate-form
