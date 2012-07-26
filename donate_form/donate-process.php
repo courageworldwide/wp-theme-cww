@@ -31,16 +31,6 @@ require_once 'text/countries.inc';
 // - %card_number
 // - %amount
 
-// Get donate-form related meta information
-$df_update_hr 						= types_render_field('cww_df_update_highrise', array('raw' => TRUE));
-$df_mc_list_id 						= types_render_field('cww_df_mailchimp_list_id', array('raw' => TRUE));
-$df_monthly_duration				= types_render_field('cww_df_monthly_duration', array('raw' => TRUE));
-$df_annual_duration					= types_render_field('cww_df_annual_duration', array('raw' => TRUE));
-$df_confirmation_post_id 			= types_render_field('cww_df_conf_post_id', array('raw' => TRUE));
-$df_confirmation_mail_post_id 		= types_render_field('cww_df_conf_mail_post_id', array('raw' => TRUE));
-if (!$df_confirmation_mail_post_id)
-	$df_confirmation_mail_post_id = $df_confirmation_post_id;
-
 // Fields requring user input
 $df_required_fields = array(
 	'df_firstname',
@@ -62,6 +52,16 @@ $df_required_fields = array(
 $df_errors = array();
 
 if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
+  // Get donate-form related meta information
+  $df_post_id							= $_POST['df_post_id'];
+  unset($_POST['df_post_id']);
+  $df_update_hr							= get_post_meta($post_id, 'cww_df_update_hr', TRUE);
+  $df_mc_list_id						= get_post_meta($post_id, 'cww_df_mc_list_id', TRUE);
+  $df_confirmation_post_id				= get_post_meta($post_id, 'cww_df_conf_post_id', TRUE);
+  $df_confirmation_mail_post_id			= get_post_meta($post_id, 'cww_df_conf_mail_post_id', TRUE);
+  
+  $df_confirmation_post_id = is_numeric($df_confirmation_post_id) ? $df_confirmation_post_id : $post_id;
+  $df_confirmation_mail_post_id = is_numeric($df_confirmation_mail_post_id) ? $df_confirmation_mail_post_id : $df_confirmation_post_id;
   // Form has been submitted.
     // Clean input data.
 	$df_clean = array();
@@ -193,7 +193,7 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 		// Auth.net submission
 		if ($df_data['donation']['recurring']) {
 			// - Recurring
-			$response = df_submit_recurring_donation($df_data);
+			$response = df_submit_recurring_donation($df_data, $df_post_id);
 			// Handle errors thrown during payment processing
 			if($response->xml->messages->resultCode == "Error"){
 				// Transaction was NOT approved.
@@ -205,7 +205,7 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 			}
 		} else {  // end if($df_data['donation']['recurring'])
 			// - One time
-			$response = df_submit_onetime_donation($df_data); 
+			$response = df_submit_onetime_donation($df_data, $df_post_id); 
 			// Handle errors thrown during payment processing
 			if($response->approved){
 				// Transaction approved.
@@ -239,6 +239,7 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 				$df_start = $df_data['donation']['start_date'];
 			$df_hr_transaction	= array(
 				'id' => (isset($df_data['donation']['transaction_id']) ? $df_data['donation']['transaction_id'] : $df_data['donation']['subscription_id']),
+				'task_delay' => get_post_meta($post_id, 'cww_df_highrise_setting_task_delay'),
 				'source' => $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
 				'pay_method' => card_type($df_data['card']['num']),
 				'account' => 'Auth.net',
@@ -254,8 +255,24 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 				$df_hr_transaction['products'][0]['start_date'] = $df_start;
 			if ($df_data['donation']['type_code'] == 'business')
 				$df_hr_transaction['products'][0]['category'] = 'business';
-			
-			$df_hr = new CwwHighriseInterface();
+				
+			$df_hr_config_fields = array(
+				'cww_df_highrise_setting_admin_user_id',
+				'cww_df_highrise_setting_admin_group_id',
+				'cww_df_highrise_setting_deals_admin_user_id',
+				'cww_df_highrise_setting_task_delay',
+				'cww_df_highrise_setting_onetime_category_id',
+				'cww_df_highrise_setting_monthly_category_id',
+				'cww_df_highrise_setting_annual_category_id',
+				'cww_df_highrise_setting_business_category_id'
+			);
+			$df_hr_config = array();
+			foreach ( $df_hr_config_fields as $key )
+				$df_hr_config[$key] = get_post_meta($df_post_id, $key, TRUE);
+			$df_hr_account 	= get_post_meta($df_post_id, 'cww_df_highrise_setting_account', TRUE);
+			$df_hr_token	= get_post_meta($df_post_id, 'cww_df_highrise_setting_api_token', TRUE);
+
+			$df_hr = new CwwHighriseInterface($df_hr_config, $account, $token);
 			$df_person = $df_hr->syncContact($df_data['donor']);
 			
 			$df_hr->addTransaction($df_hr_transaction, $df_person);
@@ -347,8 +364,10 @@ function validate_phone_number($num, $errors, $key = 'phone') {
 	}
 }
 
-function df_submit_onetime_donation($data) {
-	$transaction = new AuthorizeNetAIM();
+function df_submit_onetime_donation($data, $post_id) {
+	$login 	= get_meta_data($post_id, 'cww_df_authorizenet_setting_api_login_id', TRUE);
+	$key 	= get_meta_data($post_id, 'cww_df_authprozenet_setting_transaction_key', TRUE);
+	$transaction = new AuthorizeNetAIM($login, $key);
 	// Donor data
 	$transaction->setFields(
         array(
@@ -370,11 +389,19 @@ function df_submit_onetime_donation($data) {
     );
 	return $transaction->authorizeAndCapture();
 }
-function df_submit_recurring_donation($data) {
-	$data['donation']['interval_unit'] 	= "months";
-	/* DONATIONS CONTINUE UNTIL CANCELLED BY THE DONOR! */
-	$data['donation']['occurrences']		= 9999;
-	// Create Auth.net subscription
+function df_submit_recurring_donation($data, $post_id) {
+	$login 	= get_meta_data($post_id, 'cww_df_authorizenet_setting_api_login_id', TRUE);
+	$key 	= get_meta_data($post_id, 'cww_df_authprozenet_setting_transaction_key', TRUE);
+	$request = new AuthorizeNetARB($login, $key);
+	
+	if (preg_match('/(month)|(business)/', $data['donation']['type'])) {
+		$data['donation']['interval_unit'] 	= "months";
+		$data['donation']['occurrences']		= get_meta_data($post_id, 'cww_monthly_duration', TRUE);
+	} else {
+		$data['donation']['interval_unit'] 	= "years";
+		$data['donation']['occurrences']		= get_meta_data($post_id, 'cww_annual_duration', TRUE);
+	}
+	
 	// Set the subscription fields.
 	$name = $data['donor']['first_name'] . ' ' . $data['donor']['last_name'];
 	$subscription = new AuthorizeNet_Subscription;
@@ -403,8 +430,6 @@ function df_submit_recurring_donation($data) {
 	// Order data
 	$subscription->orderInvoiceNumber		= $data['donation']['type'];
 	
-	// Create the subscription.
-	$request = new AuthorizeNetARB;
 	// Submit request to Authorize.net
 	return $request->createSubscription($subscription);
 }
