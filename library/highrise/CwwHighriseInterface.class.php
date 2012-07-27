@@ -1,6 +1,6 @@
 <?php
 /****************************************************************************************
- * Simplified interface designed for Courage Worldwide (CWW).
+ * Simplified Wordpress/Highrise interface designed for Courage Worldwide (CWW).
  * Author: Jesse Rosato
  * Date:   6-15-12
  *
@@ -14,8 +14,9 @@
  /***************************************************************************************/
 class CwwHighriseInterface {
 	protected $_hr; // Highrise API object
+	protected $_config; // Configuration array.
 	
-	public function __construct($hr_account = FALSE, $hr_token = FALSE)
+	public function __construct($config, $hr_account = FALSE, $hr_token = FALSE)
 	{	
 		// Load required files
 		require_once('lib/HighriseAPI.class.php');
@@ -25,13 +26,18 @@ class CwwHighriseInterface {
 		if (!$hr_token)
 			$hr_token = HIGHRISE_TOKEN;
 		if (!$hr_account || !$hr_token)
-			throw new Exception('The Courage Worldwide Highrise interface requires a Highrise account and token.');
+			throw new Exception('This Highrise interface requires a Highrise account and token.');
 			
 		// Initialize API
 		$this->_hr = new HighriseAPI();
 		$this->_hr->debug = false;
 		$this->_hr->setAccount($hr_account);
 		$this->_hr->setToken($hr_token);
+		
+		if (is_array($config))
+			$this->_config = $config;
+		else
+			throw new Exception('This Highrise interface requires a configuration array. (This is the Wordpress version.)');
 	}
 	
 	/***************************************************************************************
@@ -149,6 +155,7 @@ class CwwHighriseInterface {
 			$name 				= $person->getFirstName() . ' ' . $person->getLastName();
 			$product_type 		= ucfirst($product['type']) . ' Donation';
 			$product_category 	= isset($product['category']) ? $product['category'] : 'General donation';
+			$task_delay			= $this->_config['task_delay'];
 			$datetime			= date('n-d-Y H:i');
 			if (!(isset($product['start_date'])) || !$product['start_date']) {
 				if ($product['type'] == 'onetime')
@@ -179,9 +186,9 @@ class CwwHighriseInterface {
 					$exp_date = date('n/d/Y', strtotime($start_date . "+" . $product['duration'] . " months"));
 				if ($product['type'] == 'annual')
 					$exp_date = date('n/d/Y', strtotime($start_date . "+" . $product['duration'] . " years"));
-				$due_date = date('Y-m-d', strtotime($start_date . "+" . HR_DEFAULT_TASK_DELAY));
+				$due_date = date('Y-m-d', strtotime($start_date . "+" . $task_delay));
 				$task_body = 'Follow up on recurring donation, made ';
-				$task_body .= HR_DEFAULT_TASK_DELAY;
+				$task_body .= $task_delay;
 				$task_body .= " ago.  Donation expires on $exp_date.";
 				$result[$i]['task'] = $this->addTask($task_body, $due_date, $result[$i]['deal']);
 			}
@@ -288,10 +295,10 @@ class CwwHighriseInterface {
 		$deal->setCurrency();
 		//$deal->setGroupId(HR_GROUP_ID_ADMIN);
 		$deal->setVisibleTo("NamedGroup");
-		$deal->setGroupId(HR_GROUP_ID_ADMIN);
-		$deal->setOwnerId(HR_USER_ID_ADMIN_DEALS);
-		$deal->setAuthorId(HR_USER_ID_ADMIN_DEALS);
-		$deal->setResponsiblePartyId(HR_USER_ID_ADMIN_DEALS);
+		$deal->setGroupId($this->_config['admin_group_id']);
+		$deal->setOwnerId($this->_config['deals_admin_user_id']);
+		$deal->setAuthorId($this->_config['deals_admin_user_id']);
+		$deal->setResponsiblePartyId($this->_config['deals_admin_user_id']);
 		if ($product['type'] == 'monthly' || $product['type'] == 'annual')
 			$deal->setDuration($product['duration']);
 		
@@ -326,34 +333,34 @@ class CwwHighriseInterface {
 		if (!$category || preg_match('/general/i', $category)) {
 			switch ($type) {
 				case 'monthly':
-					return HR_DEAL_CAT_ID_GENERAL_MONTHLY;
+					return $this->_config['general_monthly_deal_category_id'];
 					break;
 				case 'annual':
-					return HR_DEAL_CAT_ID_GENERAL_YEARLY;
+					return $this->_config['general_annual_deal_category_id'];
 					break;
 				default:
-					return HR_DEAL_CAT_ID_GENERAL_ONETIME;
+					return $this->_config['general_onetime_deal_category_id'];
 			}
 		}
 		
 		// BUSINESS PARTNER
 		if (preg_match('/business/i', $category))
-			return HR_DEAL_CAT_ID_BUSINESS_MONTHLY;
+			return $this->_config['business_monthly_deal_category_id'];
 	 
 		// RESCUE
 		if (preg_match('/rescue/i', $category))
-			return HR_DEAL_CAT_ID_RESCUE_ONETIME;
+			return $this->_config['rescue_onetime_deal_category_id'];
 			
 		// RESTORE
 		switch ($type) {
 		 case 'monthly':
-		 	return HR_DEAL_CAT_ID_RESTORE_MONTHLY;
+		 	return $this->_config['restore_monthly_deal_category_id'];
 		 	break;
 		 case 'annual':
-		 	return HR_DEAL_CAT_ID_RESTORE_YEARLY;
+		 	return $this->_config['restore_annual_deal_category_id'];
 		 	break;
 		 default:
-		 	return HR_DEAL_CAT_ID_RESTORE_ONETIME;
+		 	return $this->_config['restore_onetime_deal_category_id'];
 		}
 	}
 	

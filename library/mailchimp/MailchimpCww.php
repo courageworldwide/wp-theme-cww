@@ -13,8 +13,8 @@
  ******************************************************************************/
 require_once 'lib/MCAPI.class.php';
 
-function syncMailchimpContact($data, $list) {
-	$api = new MCAPI(MAILCHIMP_TOKEN);
+function syncMailchimpContact($data, $token, $list) {
+	$api = new MCAPI($token);
 	$merge_vars['FNAME'] = $data['first_name'];
 	$merge_vars['LNAME'] = $data['last_name'];
 	$retval = $api->listSubscribe($list, $data['email'], $merge_vars, 'html', FALSE);
