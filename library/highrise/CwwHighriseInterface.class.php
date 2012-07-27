@@ -155,7 +155,7 @@ class CwwHighriseInterface {
 			$name 				= $person->getFirstName() . ' ' . $person->getLastName();
 			$product_type 		= ucfirst($product['type']) . ' Donation';
 			$product_category 	= isset($product['category']) ? $product['category'] : 'General donation';
-			$task_delay			= $transaction['task_delay'];
+			$task_delay			= $this->_config['task_delay'];
 			$datetime			= date('n-d-Y H:i');
 			if (!(isset($product['start_date'])) || !$product['start_date']) {
 				if ($product['type'] == 'onetime')
