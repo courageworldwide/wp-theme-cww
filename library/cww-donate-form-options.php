@@ -16,25 +16,27 @@ function cww_df_options_page_sections() {
 }
 
 function cww_df_options_page_fields() {
-	$options[] = array(
+	$options['cww_df_authorizenet_setting_api_login_id'] = array(
 		'section' 	=> 'cww_df_authorizenet_setting_section',
 		'id'		=> 'cww_df_authorizenet_setting_api_login_id',
 		'title'		=> __('API login ID', 'cww'),
 		'desc'		=> __('The Authorize.net API login ID to use for processing donate form donations.', 'cww'),
 		'type'		=> 'text',
-		'std'		=> __('API login ID', 'cww')
+		'std'		=> __('API login ID', 'cww'),
+		'req'		=> true
 	);
 	
-	$options[] = array(
+	$options['cww_df_authorizenet_setting_transaction_key'] = array(
 		'section' 	=> 'cww_df_authorizenet_setting_section',
 		'id'		=> 'cww_df_authorizenet_setting_transaction_key',
 		'title'		=> __('Transaction key', 'cww'),
 		'desc'		=> __('The Authorize.net transaction key to use for processing donate form donations.', 'cww'),
 		'type'		=> 'text',
-		'std'		=> __('Token', 'cww')
+		'std'		=> __('Token', 'cww'),
+		'req'		=> true
 	);
 	
-	$options[] = array(
+	$options['cww_df_mailchimp_setting_api_token'] = array(
 		'section' 	=> 'cww_df_mailchimp_setting_section',
 		'id'		=> 'cww_df_mailchimp_setting_api_token',
 		'title'		=> __('API token', 'cww'),
@@ -43,7 +45,7 @@ function cww_df_options_page_fields() {
 		'std'		=> __('API token', 'cww')
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_account'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_account',
 		'title'		=> __('Account', 'cww'),
@@ -52,7 +54,7 @@ function cww_df_options_page_fields() {
 		'std'		=> __('Account', 'cww')
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_api_token'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_api_token',
 		'title'		=> __('API token', 'cww'),
@@ -61,7 +63,7 @@ function cww_df_options_page_fields() {
 		'std'		=> __('API token', 'cww')
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_admin_user_id'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_admin_user_id',
 		'title'		=> __('Administrator ID', 'cww'),
@@ -71,7 +73,7 @@ function cww_df_options_page_fields() {
 		'class'		=> 'numeric'
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_admin_group_id'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_admin_group_id',
 		'title'		=> __('Administrator group ID', 'cww'),
@@ -81,7 +83,7 @@ function cww_df_options_page_fields() {
 		'class'		=> 'numeric'
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_deals_admin_user_id'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_deals_admin_user_id',
 		'title'		=> __('Deals administrator ID', 'cww'),
@@ -91,7 +93,7 @@ function cww_df_options_page_fields() {
 		'class'		=> 'numeric'
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_task_delay'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_task_delay',
 		'title'		=> __('Task delay', 'cww'),
@@ -100,7 +102,7 @@ function cww_df_options_page_fields() {
 		'std'		=> __('e.g. 6 months', 'cww')
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_onetime_category_id'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_onetime_category_id',
 		'title'		=> __('One time category ID', 'cww'),
@@ -110,7 +112,7 @@ function cww_df_options_page_fields() {
 		'class'		=> 'numeric'
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_monthly_category_id'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_monthly_category_id',
 		'title'		=> __('Monthly category ID', 'cww'),
@@ -120,7 +122,7 @@ function cww_df_options_page_fields() {
 		'class'		=> 'numeric'
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_annual_category_id'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_annual_category_id',
 		'title'		=> __('Annual category ID', 'cww'),
@@ -130,7 +132,7 @@ function cww_df_options_page_fields() {
 		'class'		=> 'numeric'
 	);
 	
-	$options[] = array(
+	$options['cww_df_highrise_setting_business_category_id'] = array(
 		'section' 	=> 'cww_df_highrise_setting_section',
 		'id'		=> 'cww_df_highrise_setting_business_category_id',
 		'title'		=> __('Business category ID', 'cww'),

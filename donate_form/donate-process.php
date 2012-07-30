@@ -60,7 +60,7 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
   $df_confirmation_post_id				= get_post_meta($df_post_id, 'cww_df_conf_post_id', TRUE);
   $df_confirmation_mail_post_id			= get_post_meta($df_post_id, 'cww_df_conf_mail_post_id', TRUE);
   
-  $df_confirmation_post_id = is_numeric($df_confirmation_post_id) ? $df_confirmation_post_id : $post_id;
+  $df_confirmation_post_id = is_numeric($df_confirmation_post_id) ? $df_confirmation_post_id : $df_post_id;
   $df_confirmation_mail_post_id = is_numeric($df_confirmation_mail_post_id) ? $df_confirmation_mail_post_id : $df_confirmation_post_id;
   // Form has been submitted.
     // Clean input data.

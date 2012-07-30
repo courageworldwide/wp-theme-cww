@@ -1,5 +1,6 @@
 <?php
 
+add_action( 'init', 'cww_df_create_post_type' );
 function cww_df_create_post_type() {
 	register_post_type(
 		'cww_donate_form',
@@ -22,14 +23,17 @@ function cww_df_create_post_type() {
 			'has_archive' => false,
 			'show_in_nav_menus' => false,
 			'menu_position' => 20,
-			'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'page-attributes'),
+			'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'page-attributes', 'post-formats'),
 		)
 	);
 	flush_rewrite_rules();
 }
-add_action( 'init', 'cww_df_create_post_type' );
 
+add_action('admin_init', 'cww_df_add_meta_boxes_to_post_type');
 function cww_df_add_meta_boxes_to_post_type() {
+	$temp = cww_df_options_get_settings();
+	$options = $temp['cww_df_options_page_fields'];
+
 	// Confirmation post ID
 	add_meta_box(
 		'cww_df_conf_post_id',
@@ -63,7 +67,7 @@ function cww_df_add_meta_boxes_to_post_type() {
 	// Monthly donation duration (in months)
 	add_meta_box(
 		'cww_df_monthly_duration',
-		__('Monthly donation duration'),
+		__('Monthly Donation Duration'),
 		'cww_df_meta_box_callback',
 		'cww_donate_form',
 		'advanced',
@@ -78,7 +82,7 @@ function cww_df_add_meta_boxes_to_post_type() {
 	// Annual donation duration (in years)
 	add_meta_box(
 		'cww_df_annual_duration',
-		__('Annual donation duration'),
+		__('Annual Donation Duration'),
 		'cww_df_meta_box_callback',
 		'cww_donate_form',
 		'advanced',
@@ -90,36 +94,58 @@ function cww_df_add_meta_boxes_to_post_type() {
 			'default' => '5',
 		)
 	);
-	// Mailchimp List ID
-	add_meta_box(
-		'cww_df_mc_list_id',
-		__('Mailchimp List ID'),
-		'cww_df_meta_box_callback',
-		'cww_donate_form',
-		'advanced',
-		'default',
-		array(
-			'type' => 'text',
-			'desc' => __("Please enter the ID of the Mailchimp list to which you'd like to add users who complete this form.  Leave blank to disable Mailchimp sign-up on this form.", 'cww'),
-			'default' => '',
-		)
-	);
-	// Confirmation mail post ID
-	add_meta_box(
-		'cww_df_update_hr',
-		__('Update Highrise'),
-		'cww_df_meta_box_callback',
-		'cww_donate_form',
-		'advanced',
-		'default',
-		array(
-			'type' => 'checkbox',
-			'desc' => __("Choose whether or not to update the Highrise database with the user and donation data upon completion of this form.", 'cww'),
-			'default' => '1',
-		)
-	);
+	
+	if ( cww_df_option_is_set( $options['cww_df_mailchimp_setting_api_token'] ) ) {
+		// Mailchimp List ID
+		add_meta_box(
+			'cww_df_mc_list_id',
+			__('Mailchimp List ID'),
+			'cww_df_meta_box_callback',
+			'cww_donate_form',
+			'advanced',
+			'default',
+			array(
+				'type' => 'text',
+				'desc' => __("Please enter the ID of the Mailchimp list to which you'd like to add users who complete this form.  Leave blank to disable Mailchimp sign-up on this form.", 'cww'),
+				'default' => '',
+			)
+		);
+	}
+	
+	$hr_required = array(
+					'cww_df_highrise_setting_account', 
+					'cww_df_highrise_setting_api_token',
+					'cww_df_highrise_setting_admin_user_id',
+					'cww_df_highrise_setting_admin_group_id',
+					'cww_df_highrise_setting_deals_admin_user_id',
+					'cww_df_highrise_setting_task_delay',
+					'cww_df_highrise_setting_onetime_category_id',
+					'cww_df_highrise_setting_monthly_category_id',
+					'cww_df_highrise_setting_annual_category_id',
+					'cww_df_highrise_setting_business_category_id'
+				   );
+	$hr_metabox = true;
+	foreach ( $hr_required as $key ) {
+		if ( !isset( $options[$key] ) || !cww_df_option_is_set( $options[$key] ) )
+			$hr_metabox = false;
+	}
+	if ( $hr_metabox ) {
+		// Update Highrise
+		add_meta_box(
+			'cww_df_update_hr',
+			__('Update Highrise'),
+			'cww_df_meta_box_callback',
+			'cww_donate_form',
+			'advanced',
+			'default',
+			array(
+				'type' => 'checkbox',
+				'desc' => __("Choose whether or not to update the Highrise database with the user and donation data upon completion of this form.", 'cww'),
+				'default' => '1',
+			)
+		);
+	}
 }
-add_action('admin_init', 'cww_df_add_meta_boxes_to_post_type');
 
 /* Prints the box content */
 function cww_df_meta_box_callback( $post, $metabox ) {
@@ -130,12 +156,12 @@ function cww_df_meta_box_callback( $post, $metabox ) {
 	$mb_type	= isset($metabox['args']['type']) ? $metabox['args']['type'] : 'text';
 	$mb_class 	= isset($metabox['args']['class']) ? $metabox['args']['class'] : '';
 	$mb_desc	= isset($metabox['args']['desc']) ? $metabox['args']['desc'] : '';
-	$mb_val 	= get_post_meta($post->ID, $mb_key, TRUE);
+	$mb_val 	= get_post_meta($post->ID, $mb_key, true);
 	
 	$mb_val 	= $mb_val ? $mb_val : $metabox['args']['default'];
 	
 	$label  = '<label for="' . $mb_key . '" >' . $mb_title . '</label>';
-	$desc  = $mb_desc ? '<div class="input-description">' . $mb_desc . '</div>' : '';
+	$desc  = $mb_desc ? '<p class="metabox-description">' . $mb_desc . '</p>' : '';
 
 	switch ($mb_type) {
 		case 'checkbox':
@@ -161,6 +187,7 @@ function cww_df_meta_box_callback( $post, $metabox ) {
 	}
 }
 
+add_action( 'save_post', 'cww_df_save_post');
 function cww_df_save_post( $post_id ) {
 	// verify if this is an auto save routine. 
 	// If it is our form has not been submitted, so we dont want to do anything
@@ -182,43 +209,59 @@ function cww_df_save_post( $post_id ) {
 	}
 	
 	// OK, we're authenticated: we need to find and save the data
-	$_POST['cww_df_hr_update'] = isset($_POST['cww_df_mc_list_id']) && $_POST['cww_df_mc_list_id'] ? 1 : 0;
+	$_POST['cww_df_hr_update'] = isset( $_POST['cww_df_mc_list_id'] ) && $_POST['cww_df_mc_list_id'] ? 1 : 0;
 	
-	foreach ($_POST as $key => $value) {
+	foreach ( $_POST as $key => $value ) {
 		if ( preg_match( '/^cww_df_.*/', $key ) ) {
 			$value = trim( $_POST[$key] );
 			add_post_meta( $post_id, $key, $value );
 		}
 	}
 }
-add_action( 'save_post', 'cww_df_save_post');
 
-
+add_action('admin_notices','cww_df_admin_notice');
 function cww_df_admin_notice(){
-    $screen = get_current_screen();
-    //If not on the screen with ID 'edit-post' abort.
-    if( $screen->id !='edit-cww_donate_form' )
-        return;
-     
-    $settings = cww_df_options_get_settings();
-    $options = get_option('cww_df_options');
-     
-    $error = FALSE;
-    foreach ( $settings['cww_df_options_page_fields'] as $array ) {
-     	$key = $array['id'];
-	    if ( $options[$key] == $array['std'] || !$options[$key] )
-	    	$error = TRUE;
-    }
-    
-    if ($error) {
+	if (!current_user_can('manage_options'))
+		return;
+
+    if ( cww_df_required_options_are_set() ) {
     ?>
     	<div class="error">
     	  <p>
-    	  	<strong>Warning</strong><br />
-    	    <?php _e( "You should visit 'Settings > Donate forms' and make sure your settings are correct before you attempt to add any donate forms." ); ?>
+    	  	<strong><?php _e('Courage Worldwide Notice'); ?></strong><br />
+    	  </p>
+    	  <p>
+    	    <?php _e( "Donate forms are not enabled.  You must first supply your sitewide information in 'Settings >> Donate forms'." ); ?>
     	  </p>
     	</div>
 	<?php
 	}
  }
- add_action('admin_notices','cww_df_admin_notice');
+ 
+ add_filter( 'custom_menu_order', 'cww_df_required_options_are_set' );
+ function cww_df_required_options_are_set() {
+ 	$options = cww_df_options_get_settings();
+	foreach ( $options['cww_df_options_page_fields'] as $option ) {
+		if ( isset( $option['req'] ) && $option['req'] && !cww_df_option_is_set($option) )
+			return true;
+	}
+    return false;
+ }
+ 
+ function cww_df_option_is_set( $option ) {
+ 	static $settings = false;
+ 	$settings = $settings ? $settings : get_option('cww_df_options');
+ 	$setting = isset($settings[$option['id']]) ? $settings[$option['id']] : false;
+	return ( $setting && $option['std'] != $setting );
+ }
+ 
+ add_filter( 'menu_order', 'cww_df_hide_post_type' );
+ function cww_df_hide_post_type($menu_order) {		
+	global $menu;
+	foreach ( $menu as $key => $array ) {
+		if ( in_array( 'edit.php?post_type=cww_donate_form', $array ) ) 
+			$unset_key = $key;
+	}
+	unset($menu[$unset_key]);
+	return $menu_order;
+ }
