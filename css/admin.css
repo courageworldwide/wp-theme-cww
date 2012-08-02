@@ -12,7 +12,7 @@ label.error {
 }
 
 #menu-posts-cww_donate_form .wp-menu-image {
-	background: url(../../images/df-post-type-icon.png) no-repeat 6px -18px !important;
+	background: url(../images/df-post-type-icon.png) no-repeat 6px -18px !important;
 }
         
 #menu-posts-cww_donate_form:hover .wp-menu-image, #menu-posts-cww_donate_form.wp-has-current-submenu .wp-menu-image {
@@ -20,5 +20,5 @@ label.error {
 }
 
 #icon-edit.icon32-posts-cww_donate_form {
-	background: url(../../images/df-post-type-icon-32x32.png) no-repeat;
+	background: url(../images/df-post-type-icon-32x32.png) no-repeat;
 }
