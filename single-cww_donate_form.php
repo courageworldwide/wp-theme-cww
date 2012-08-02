@@ -1,5 +1,5 @@
 <?php
-require_once(ABSPATH . 'wp-content/themes/cww/donate_form/donate-process.php');
+require_once(ABSPATH . 'wp-content/themes/cww/library/post-types/donate_form/process.php');
 $layout = get_post_meta($post->ID, '_layout', true);
 if (empty($layout) || $layout == 'default'){
 	$layout=theme_get_option('general','layout');

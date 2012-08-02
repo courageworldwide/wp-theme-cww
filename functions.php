@@ -2,13 +2,11 @@
 /****************************************************************
  * Functions for the Courage Worldwide theme.
  ****************************************************************/
-
-require_once('library/cww-donate-form-post-type.php');
-
 // Require donate form settings in admin
 if (is_admin()) {
-	require_once('library/cww-donate-form-settings.php');
+	require_once('library/post_types/donate_form/settings.php');	
 }
+require_once('library/post_types/donate_form/post-type.php');
 
 function cww_scripts() {
 	// Build dependency array for donate-form
