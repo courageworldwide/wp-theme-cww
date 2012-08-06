@@ -187,6 +187,7 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 	validate_card_exp($df_data['card']['exp'], $df_errors, 'df_exp_date');
 	//   - Validate credit card code
 	validate_card_code($df_data['card']['code'], $df_errors, 'df_card_code');
+
 	
 	// - Validate email address
 	if (((!isset($df_errors['df_email'])) || (!$df_errors['df_email'])) && (!filter_var($df_data['donor']['email'], FILTER_VALIDATE_EMAIL))) {
@@ -376,34 +377,34 @@ function validate_start_date($date, $errors, $key = 'startdate', $after_today = 
 	}
 }
 
-function validate_card_num($num, $errors, $key = 'card_num') {
+function validate_card_num($num, &$errors, $key = 'card_num') {
 	$filter_options = array('options' => array('regexp' => '/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/'));
 	if ((!isset($errors[$key])) && (!filter_var($num, FILTER_VALIDATE_REGEXP, $filter_options))) {
 		$errors[$key] = 'format';
 	}
 }
 
-function validate_card_exp($exp, $errors, $key = 'card_exp') {
+function validate_card_exp($exp, &$errors, $key = 'card_exp') {
 	$filter_options = array('options' => array('regexp' => '/^(0[1-9]|1[012])(1[2-9]|[2-9][0-9])$/'));
 	if ((!isset($errors[$key])) && (!filter_var($exp, FILTER_VALIDATE_REGEXP, $filter_options))) {
 		$errors[$key] = 'format';
 	} else {
 		// Check card expiration date.
-		$today = date("m-d");
+		$today = date("m-y");
 		$today = strtotime($today);
 		$exp = strtotime($exp);
 		if ($exp < $today)
-			$errors['df_exp_date'] = 'invalid';
+			$errors[$key] = 'invalid';
 	}
 }
 
-function validate_card_code($code, $errors, $key = 'card_code') {
+function validate_card_code($code, &$errors, $key = 'card_code') {
 	$filter_options = array('options' => array('regexp' => '/^[0-9]{3,4}$/'));
 	if ((!isset($errors[$key])) && (!filter_var($code, FILTER_VALIDATE_REGEXP, $filter_options)))
 		$errors[$key] = 'format';
 }
 
-function validate_phone_number($num, $errors, $key = 'phone') {
+function validate_phone_number($num, &$errors, $key = 'phone') {
 	$filter_options = array('options' => array('regexp'=>'/\(?\d{3}\)?[-\s.]?\d{3}[-\s.]?\d{4}/x'));
 	if ((!isset($errors[$key])) && (!filter_var($num, FILTER_VALIDATE_REGEXP, $filter_options))) {
 		$errors[$key] = 'format';
