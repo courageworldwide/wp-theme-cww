@@ -99,13 +99,60 @@ class CwwPostTypeEngine {
 		$meta_box_title	= $meta_box['title'];
 		$meta_box_type	= isset($meta_box['args']['type']) ? $meta_box['args']['type'] : 'text';
 		$meta_box_class = isset($meta_box['args']['class']) ? $meta_box['args']['class'] : '';
+		$meta_box_class = is_array($meta_box_class) ? implode(', ', $meta_box_class) : $meta_box_class;
 		$meta_box_desc	= isset($meta_box['args']['desc']) ? $meta_box['args']['desc'] : '';
 		$meta_box_def	= isset($meta_box['args']['default']) ? $meta_box['args']['default'] : '';
 		$meta_box_val 	= get_post_meta($post->ID, $meta_box_key);
 		$meta_box_val 	= empty($meta_box_val) ? $meta_box_def : array_shift(array_values($meta_box_val));
-		$label  = '<label for="' . $meta_box_key . '" >' . $meta_box_title . '</label>';
+		$label  = '<label for="' . $meta_box_key . '" class="' . $meta_box_class . '">' . $meta_box_title . '</label>';
 		$desc  = $meta_box_desc ? '<p class="metabox-description">' . $meta_box_desc . '</p>' : '';
 		switch ($meta_box_type) {
+			case 'date':
+				$input  = '<input type="text" ';
+				$input .= 'class="' . $meta_box_class . '" ';
+				$input .= 'id="' . $meta_box_key . '" ';
+				$input .= 'name="' . $meta_box_key . '" ';
+				$input .= 'value="' . $meta_box_val . '" ';
+				$input .= '/>';
+				echo $label . '&nbsp;' . $input . $desc;
+			break;
+			case 'time':
+				preg_match('/^(\d{1,2})[:](\d\d)(.*)$/', $meta_box_val, $time);
+				$hours  = $time[1];
+				$mins   = $time[2];
+				$ampm   = preg_match('/p/i', $time[3]) ? 'p' : 'a';
+				?>
+				<?php echo $label; ?>
+				&nbsp;&nbsp;
+				<select name="<?php echo $meta_box_key; ?>[1]" class="<?php echo $meta_box_class; ?>, hours" ?>[0]">
+				<?php
+				for ($i = 1; $i < 13; $i++) {
+					echo '<option value="' . $i . '" ';
+					echo ($hours == $i ? 'selected="selected"' : '') . '>';
+					echo $i . '</option>';
+				}
+				?>
+				</select>
+				&nbsp;&nbsp;
+				<select name="<?php echo $meta_box_key; ?>[2]" class="<?php echo $meta_box_class; ?>, minutes"> 
+				<?php
+				for ($i = 0; $i < 4; $i++) {
+					$opt_mins = $i ? $i * 15 : '00';
+					echo '<option value="' . $opt_mins . '" ';
+					echo ($mins == $opt_mins ? 'selected="selected"' : '') . '>';
+					echo $opt_mins . '</option>';
+				}
+				?>
+				</select>
+				&nbsp;&nbsp;
+				<select name="<?php echo $meta_box_key; ?>[3]" class="<?php echo $meta_box_class; ?>, ampm">
+					<option value="a" <?php echo $ampm == 'a' ? 'selected="selected"' : ''; ?> >AM</option>;
+					<option value="p" <?php echo $ampm == 'p' ? 'selected="selected"' : ''; ?> >PM</option>;
+				</select>
+				&nbsp;
+				<?php echo $desc; ?>
+				<?php
+			break;
 			case 'checkbox':
 				$input  = '<input type="checkbox" ';
 				$input .= 'class="' . $meta_box_class . '" '; 
@@ -115,7 +162,6 @@ class CwwPostTypeEngine {
 				$input .= 'value="1" ';
 				$input .= '/>';
 				echo $input . '&nbsp' . $label . $desc;
-				
 			break;
 			case 'text':
 				$input  = '<input type="text" ';
@@ -125,6 +171,14 @@ class CwwPostTypeEngine {
 				$input .= 'value="' . $meta_box_val . '" ';
 				$input .= '/>';
 				echo $label . '&nbsp;' . $input . $desc;
+			break;
+			case 'textarea':
+				$input  = '<textarea ';
+				$input .= 'class="' . $meta_box_class . '" '; 
+				$input .= 'id="' . $meta_box_key . '" ';
+				$input .= 'name="' . $meta_box_key . '" ';
+				$input .= '>' . $meta_box_val . '</textarea>';
+				echo $label . '<br />' . $input . $desc;
 			break;
 			default:
 				throw new Exception('CwwPostTypeEngine meta_box_callback() failed handling meta box type "' . $meta_box_type . '".');

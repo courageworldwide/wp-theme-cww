@@ -10,7 +10,7 @@ $cww_df_post_type = array(
 			'name' => __( 'Donate Forms' ),
 			'singular_name' => __( 'Donate Form' ),
 			'all items' => __( 'All Donate Forms' ),
-			'add_new_itm' => __( 'Add New Donate Form' ),
+			'add_new_item' => __( 'Add New Donate Form' ),
 			'edit_item' => __( 'Edit Donate Form' ),
 			'new_item' => __( 'New Donate Form' ),
 			'view_item' => __( 'View Donate Form' ),
@@ -41,7 +41,7 @@ function cww_df_save_post( $post_id ) {
 		return;
 	// verify this came from the our screen and with proper authorization,
 	// because save_post can be triggered at other times
-	if ( !wp_verify_nonce( $_POST['cww_donate_form_nonce'], 'cww_nonce_field_cww_donate_form' ) )
+	if ( !wp_verify_nonce( ( isset( $_POST['cww_donate_form_nonce'] ) ? $_POST['cww_donate_form_nonce'] : '' ), 'cww_nonce_field_cww_donate_form' ) )
 		return;
 	
 	// Get the post type object.
