@@ -12,7 +12,7 @@ function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 		'args'		=> array(
 			'type' 		=> 'text',
 			'class' 	=> 'numeric',
-			'desc' 		=> __("Please enter the ID of the Wordpress post to which you'd like users to be redirected upon successful completion of this form.", 'cww'),
+			'desc' 		=> __("Please enter the ID of the Wordpress post to which you'd like users to be redirected upon successful completion of this form. The following tokens are available: %transaction_id, %donation_type, %name, %address, %company, %card_number, and %amount.", 'cww'),
 			'default' 	=> 'e.g. 1293',
 		)
 	);

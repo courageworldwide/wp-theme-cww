@@ -333,9 +333,14 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 			if (WP_DEBUG)
 				error_log('ERROR: Donate form email confirmation sending failed!');
 		}
+		$df_trans_key = md5($df_data['first_name'] . $df_data['last_name'] . time());
+		$df_conf_post = get_post($df_confirmation_post_id);
+		$df_pass_data['conf_content'] = df_token_replace($df_conf_post->post_content, $df_data);
+		$df_pass_data['conf_post_id'] = $df_confirmation_post_id;
+		set_transient($df_trans_key, serialize($df_pass_data), 300);
 		// Redirect to confirmation page.
-		$df_url = get_permalink($df_confirmation_post_id);
-		header('Location: ' . $df_url);
+		$df_url = get_permalink($df_post_id);
+		header('Location: ' . $df_url . '?df=' . $df_trans_key);
 	} else {
 		// Errors
 		foreach($df_errors as $key => $error) {

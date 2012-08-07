@@ -272,29 +272,42 @@ class CwwSettingsEngine {
 	    $options = $this->_settings['fields'];
 	      
 	    // run a foreach and switch on option type  
-	    foreach ($options as $option) {  
+	    foreach ($options as $option) {
+	    	$key = $option['id'];
+	    	$val = trim($input[$key]);
+	    	if (isset($option['req']) && $option['req']) {
+	    		if (!$val) {
+			    	add_settings_error(  
+	                    $key, // setting title  
+	                    $key . '_error', // error ID  
+	                    "The field '" . $option['title'] . "' " . __('is required', 'cww') . '.', // error message  
+	                    'error' // type of message  
+	                );
+	            } else {
+		            $valid_input[$key] = $val;
+	            }
+	    	}
 	        switch ( $option['type'] ) {  
 	            default:  // text
 	                //switch validation based on the class!  
 	                $option['class'] = isset($option['class']) ? $option['class'] : false;
 	                switch ( $option['class'] ) {
 	                	case 'numeric':
-	                		//accept the input only when numeric!  
-	                        $input[$option['id']]       = trim($input[$option['id']]); // trim whitespace  
-	                        $valid_input[$option['id']] = (is_numeric($input[$option['id']])) ? $input[$option['id']] : 'Expecting a Numeric value!';  
-	                          
+	                		//accept the input only when numeric!   
 	                        // register error  
-	                        if(is_numeric($input[$option['id']]) == FALSE) {  
+	                        if(is_numeric($val) == false && $val) {  
 	                            add_settings_error(  
-	                                $option['id'], // setting title  
-	                                $option['id'] . '_error', // error ID  
+	                                $key, // setting title  
+	                                $key . '_error', // error ID  
 	                                "The field '" . $option['title'] . "' " . __('must be a numeric value', 'cww') . '.', // error message  
 	                                'error' // type of message  
 	                            );  
-	                        }  
+	                        } else {
+		                        $valid_input[$key] = $val;
+	                        }
 	                    break;
 	                    default:
-	                    	$valid_input[$option['id']] = trim($input[$option['id']]);
+	                    	$valid_input[$key] = $val;
 	                }
 	        }
 	   }
