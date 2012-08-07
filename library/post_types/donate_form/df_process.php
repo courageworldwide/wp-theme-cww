@@ -328,8 +328,9 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 		$df_mail_body	 = $df_mail_post->post_content;
 		$df_mail_body    = df_token_replace($df_mail_body, $df_data);
 		$df_mail_subject = $df_mail_post->post_title;
+		$df_mail_headers = 'From: ' . $df_org_from . '<' . $df_org_from_email . '>';
 		add_filter('wp_mail_content_type',create_function('', 'return "text/html"; '));
-		if (!wp_mail($df_data['donor']['email'], $df_mail_subject, $df_mail_body)) {
+		if (!wp_mail($df_data['donor']['email'], $df_mail_subject, $df_mail_body, $df_mail_headers)) {
 			if (WP_DEBUG)
 				error_log('ERROR: Donate form email confirmation sending failed!');
 		}
