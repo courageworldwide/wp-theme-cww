@@ -46,6 +46,8 @@ function cww_event_save_post( $post_id ) {
 	// Get the post type object.
     $post_type = get_post_type_object( $post->post_type );
     
+    // Get the meta boxes
+    
     // Check if the current user has permission to edit the post.
     if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
         return;

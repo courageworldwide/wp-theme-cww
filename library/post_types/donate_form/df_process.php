@@ -335,7 +335,7 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 		}
 		$df_trans_key = md5($df_data['first_name'] . $df_data['last_name'] . time());
 		$df_conf_post = get_post($df_confirmation_post_id);
-		$df_pass_data['conf_content'] = df_token_replace($df_conf_post->post_content, $df_data);
+		$df_pass_data['conf_content'] = apply_filters('the_content', df_token_replace($df_conf_post->post_content, $df_data));
 		$df_pass_data['conf_post_id'] = $df_confirmation_post_id;
 		set_transient($df_trans_key, serialize($df_pass_data), 300);
 		// Redirect to confirmation page.

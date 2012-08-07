@@ -13,6 +13,7 @@ function cww_event_meta_boxes() {
 			'type' 		=> 'date',
 			'class' 	=> 'datepicker',
 			'desc' 		=> __("Please choose the event's start date.", 'cww'),
+			'req'		=> true,
 			'default' 	=> date('m-d-Y'),
 		)
 	);
@@ -31,6 +32,7 @@ function cww_event_meta_boxes() {
 			'type' 		=> 'time',
 			'class' 	=> 'time',
 			'desc' 		=> __("Please enter the event's start time.", 'cww'),
+			'req'		=> true,
 			'default' 	=> $default_start,
 		)
 	);

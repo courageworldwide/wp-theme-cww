@@ -246,7 +246,8 @@
    </div>
    <?php 
    $df_mc_list_id = get_post_meta($post->ID, 'cww_df_mc_list_id', true);
-   $df_mc_api_token = get_option('cww_df_mailchimp_setting_api_token', false);
+   $df_mc_api_token = get_option('cww_df_options', false);
+   $df_mc_api_token = $df_mc_api_token['cww_df_mailchimp_setting_api_token'];
    if ($df_mc_api_token && $df_mc_list_id) : ?>
    <div id="subscribe-wrap" class="input-wrap checkbox single">
     <input id="df_subscribe" type="checkbox" name="df_subscribe" value="1" <?php echo (empty($df_clean) || (isset($df_clean['df_subscribe']) && $df_clean['df_subscribe']) ? 'checked="checked"' : ''); ?> style="padding-right: 16px;" />
