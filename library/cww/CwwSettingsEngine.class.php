@@ -277,12 +277,8 @@ class CwwSettingsEngine {
 	    	$val = trim($input[$key]);
 	    	if (isset($option['req']) && $option['req']) {
 	    		if (!$val) {
-			    	add_settings_error(  
-	                    $key, // setting title  
-	                    $key . '_error', // error ID  
-	                    "The field '" . $option['title'] . "' " . __('is required', 'cww') . '.', // error message  
-	                    'error' // type of message  
-	                );
+	    			$error_msg = __("The field") . " '" . $option['title'] . "' " . __('is required', 'cww') . '.';
+			    	add_settings_error($key, $key . '_error', $error_msg, 'error');
 	            } else {
 		            $valid_input[$key] = $val;
 	            }
@@ -293,15 +289,11 @@ class CwwSettingsEngine {
 	                $option['class'] = isset($option['class']) ? $option['class'] : false;
 	                switch ( $option['class'] ) {
 	                	case 'numeric':
-	                		//accept the input only when numeric!   
-	                        // register error  
-	                        if(is_numeric($val) == false && $val) {  
-	                            add_settings_error(  
-	                                $key, // setting title  
-	                                $key . '_error', // error ID  
-	                                "The field '" . $option['title'] . "' " . __('must be a numeric value', 'cww') . '.', // error message  
-	                                'error' // type of message  
-	                            );  
+	                        // If class is numeric and the input has a value,
+	                        // check that input value is numeric.
+	                        if($val && !is_numeric($val)) {
+	                        	$error_msg = __('The field') . " '" . $option['title'] . "' " . __('must be a numeric value', 'cww') . '.';
+	                            add_settings_error($key, $key . '_error', $error_msg, 'error');  
 	                        } else {
 		                        $valid_input[$key] = $val;
 	                        }
