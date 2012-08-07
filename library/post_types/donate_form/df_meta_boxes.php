@@ -42,7 +42,7 @@ function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 		'args'		=> array(
 			'type' 		=> 'text',
 			'class' 	=> 'numeric',
-			'desc' 		=> __("Number of months to repeat monthly (and business) donations.", 'cww'),
+			'desc' 		=> __("Number of months to repeat monthly (and business partner) donations.", 'cww'),
 			'default' 	=> '12',
 		)
 	);

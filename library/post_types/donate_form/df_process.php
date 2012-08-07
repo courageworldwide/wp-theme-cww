@@ -12,15 +12,14 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/authori
 require_once $_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/highrise/CwwHighriseInterface.class.php'; // Highrise interface
 require_once $_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/mailchimp/MailchimpCww.php'; // Mailchimp interface
 
+// Use test mode if WP_DEBUG is on
+WP_DEBUG ? define('AUTHORIZENET_SANDBOX', true) : define('AUTHORIZENET_SANDBOX', false);
+
 // Set org vars
 $df_org_from = get_bloginfo('name');
 $df_org_from_email = get_bloginfo('admin_email');
 $df_org_email = $df_org_from_email;
 
-// Load error messages
-require_once 'text/error.inc';
-// Load country list
-require_once 'text/countries.inc';
 
 // You may use the following tokens in your confirmation email post:
 // - %transaction_id 
@@ -87,8 +86,6 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 		$df_data['authnet']['key'] = $df_options['cww_df_authorizenet_setting_transaction_key'];
 	else
 		throw new Exception('Authorize.net transaction key not set.');
-	// For debugging, set to true
-	define('AUTHORIZENET_SANDBOX', false);
 	// - Customer data
 	$df_data['donor'] = array();
 	$df_data['donor']['first_name'] 	= $df_clean["df_firstname"];
@@ -102,8 +99,7 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 	$df_data['donor']['phone'] 			= $df_clean["df_phone"];
 	$df_data['donor']['email'] 			= $df_clean["df_email"];
 	$df_data['donor']['notes']			= $df_clean["df_notes"];
-	if (isset($df_clean["df_subscribe"]))
-		$df_data['donor']['subscribe'] 	= $df_clean["df_subscribe"]; // Whether to add to mailchimp
+	$df_data['donor']['subscribe'] 		= isset($df_clean["df_subscribe"]) ? $df_clean["df_subscribe"] : FALSE; // Whether to add to mailchimp
 	// - Card data: SECURITY RISK!! DO NOT STORE!!! ONLY FOR AUTHORIZE.NET
 	$df_data['card'] = array();
 	$df_data['card']['num']  			= $df_clean["df_card_num"]; 
@@ -332,15 +328,14 @@ if(isset($_POST["df_submit"]) && $_POST["df_submit"] != "") {
 		$df_mail_body	 = $df_mail_post->post_content;
 		$df_mail_body    = df_token_replace($df_mail_body, $df_data);
 		$df_mail_subject = $df_mail_post->post_title;
-		$df_mail_headers  = "From: " . $df_org_from . " <" . $df_org_from_email . ">\r\n";
-		$df_mail_headers .= "Cc: " . $df_org_email . "\r\n";
-		$df_mail_headers .= 'MIME-Version: 1.0' . "\r\n";
-		$df_mail_headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-		wp_mail($df_data['donor']['email'], $df_mail_subject, $df_mail_body, $df_mail_headers);
+		add_filter('wp_mail_content_type',create_function('', 'return "text/html"; '));
+		if (!wp_mail($df_data['donor']['email'], $df_mail_subject, $df_mail_body)) {
+			if (WP_DEBUG)
+				error_log('ERROR: Donate form email confirmation sending failed!');
+		}
 		// Redirect to confirmation page.
-		$df_url  = get_permalink($df_confirmation_post_id);
-		header("Location: " . $df_url);
-		exit;
+		$df_url = get_permalink($df_confirmation_post_id);
+		header('Location: ' . $df_url);
 	} else {
 		// Errors
 		foreach($df_errors as $key => $error) {

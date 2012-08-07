@@ -9,7 +9,8 @@ if (is_admin()) {
 	add_action('admin_enqueue_scripts', 'cww_admin_styles');
 }
 require_once('library/post_types/donate_form/df_post_type.php');
-require_once('library/post_types/event/event_post_type.php');
+// require_once('library/post_types/event/event_post_type.php');
+
 
 function cww_admin_scripts() {
 	wp_register_script( 'cww-admin', get_stylesheet_directory_uri() . '/js/admin.js', array( 'jquery' ));
