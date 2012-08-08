@@ -4,8 +4,7 @@ $df_error_msgs = array(
 		'multiple' => "Uh-oh, there're some problems with the information you entered.  Please check the error messages below and try again.",
 		'single' => "So close! It looks like there's a problem with the information you entered.  Please check the error message below and try again.",
 		'declined' => "We're sorry, but our payment gateway is indicating that your card has been declined.  Please check your card information and try again.",
-		'processing' => "We were not able to process your payment, please check your payment information and try again.  If you've already done that, we're sorry for the hassle and hope you'll email us at <a href=" . '"mailto:' . $df_org_from_email . '">' . $df_org_from_email . '</a>.',
-		
+		'processing' => "We were not able to process your payment, please check your payment information and try again.  If you've already done that, we're sorry for the hassle and hope you'll email us at <a href=" . '"mailto:' . get_bloginfo('admin_email') . '">' . get_bloginfo('admin_email') . '</a>.'
 	),
 	'df_firstname' => array(
 		'empty' => 'The first name field is required.',

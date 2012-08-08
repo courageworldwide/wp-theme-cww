@@ -1,5 +1,5 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/cww/CwwPostTypeEngine.class.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/utilities/CwwPostTypeEngine.class.php');
 require_once('event_meta_boxes.php');
 
 $cww_event_post_type = array(
@@ -45,14 +45,12 @@ function cww_event_save_post( $post_id ) {
 	
 	// Get the post type object.
     $post_type = get_post_type_object( $post->post_type );
-    
-    // Get the meta boxes
-    
-    // Check if the current user has permission to edit the post.
+    // Check if the current user has permission to edit this post-type.
     if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
         return;
 	
 	foreach ( $_POST as $key => $value ) {
+		$args = $meta_boxes[$key]['args'];
 		if ( preg_match( '/^cww_event_.*/', $key ) ) {
 			// Times
 			if (is_array($value)) {

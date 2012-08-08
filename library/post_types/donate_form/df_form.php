@@ -251,7 +251,7 @@
    if ($df_mc_api_token && $df_mc_list_id) : ?>
    <div id="subscribe-wrap" class="input-wrap checkbox single">
     <input id="df_subscribe" type="checkbox" name="df_subscribe" value="1" <?php echo (empty($df_clean) || (isset($df_clean['df_subscribe']) && $df_clean['df_subscribe']) ? 'checked="checked"' : ''); ?> style="padding-right: 16px;" />
-    <label for="df_subscribe" class="single-checkbox">Get news and information about <?php echo $df_org_from; ?></label>
+    <label for="df_subscribe" class="single-checkbox">Get news and information about <?php echo get_bloginfo('name'); ?></label>
    </div>
    <?php endif; ?>
   </div><!-- end #donor-wrap !-->
