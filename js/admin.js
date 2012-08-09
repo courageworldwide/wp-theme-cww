@@ -29,5 +29,5 @@ jQuery(document).ready(function($) {
           
         // look for the input with id=setting title and add a red border to it.  
         $("#" + error_setting).addClass('error');
-	});   
-}); 
+	});
+});

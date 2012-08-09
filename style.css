@@ -157,3 +157,11 @@ form.donate .input-wrap {
 form.donate #cc-logos {
 	padding-bottom: 8px;
 }
+
+#df_submit.disabled {
+	-moz-box-shadow: none !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	color: #CCCCCC;
+	background-color: #EEEEEE;
+}

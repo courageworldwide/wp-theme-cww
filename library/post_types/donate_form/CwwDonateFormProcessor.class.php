@@ -448,12 +448,11 @@ class CwwDonateFormProcessor extends FormProcessor {
 		
 		if ( !function_exists( 'get_post' ) )
 			return false;
-		
 		$mail_post		= get_post($this->meta_data['conf_mail_post_id']);
 		$mail_body		= $mail_post->post_content;
 		$mail_body		= apply_filters('the_content', $this->_token_replace($mail_body));
 		$mail_subject	= $mail_post->post_title;
-		$mail_headers	= 'From: ' . $this->meta_data['org'] . '<' . $this->meta_data['org_mail'] . '>';
+		$mail_headers	= 'From: ' . $this->meta_data['org'] . ' <' . $this->meta_data['org_mail'] . '>';
 		add_filter('wp_mail_content_type',create_function('', 'return "text/html"; '));
 		if ( wp_mail($data['donor']['email'], $mail_subject, $mail_body, $mail_headers) ) {
 			return true;

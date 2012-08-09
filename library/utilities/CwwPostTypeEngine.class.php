@@ -87,7 +87,7 @@ class CwwPostTypeEngine {
 			$callback = empty($meta_box_group['callback']) ? array(&$this, 'meta_box_callback') : $meta_box_group['callback'];
 			$context = empty($meta_box_group['context']) ? 'advanced' : $meta_box_group['context'];
 			$priority = empty($meta_box_group['priority']) ? 'default' : $meta_box_group['priority'];
-			$desc = $meta_box_group['desc'];
+			$desc = empty($meta_box_group['desc']) ? false : $meta_box_group['desc'];
 			add_meta_box($handle, $title, $callback, $post_type, $context, $priority, array('desc' => $desc));
 		}
 	} // end add_meta_boxes()

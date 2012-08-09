@@ -9,7 +9,7 @@ require_once 'text/post_process_error.inc';
 // For Authorize.net - use test mode if WP_DEBUG is on
 defined('WP_DEBUG') && WP_DEBUG ? define('AUTHORIZENET_SANDBOX', true) : define('AUTHORIZENET_SANDBOX', false);
 
-if ( !empty( $_POST["df_submit"] ) ) {
+if ( !empty( $_POST["df_post_id"] ) ) {
 	// Process form
 	$df_processor = new CwwDonateFormProcessor();
 	
