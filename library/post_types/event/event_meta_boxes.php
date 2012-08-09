@@ -1,113 +1,96 @@
 <?php
+/************************************************************************************ 
+/* Create an array describing the meta boxes for the Event custom post type.
+/*
+/* @return array
+/************************************************************************************/
 function cww_event_meta_boxes() {
 	$meta_boxes = array();
+	$meta_boxes['cww_event_details'] = array();
+	
 	// Start date
-	$meta_boxes['cww_event_start_date'] = array(
-		'handle'	=> 'cww_df_event_start_date',
+	$desc = __("Please choose the event's start date.", 'cww');
+	$desc .= '<br /><strong>Shortcode:</strong> [eventstartdate format="PHP Date format"]<br />';
+	$desc .= 'The default format is "Monday, January 12th, 2014".  See <a href="http://php.net/manual/en/function.date.php">here</a> for more information about PHP Date formats.';
+	$meta_boxes['cww_event_details']['cww_event_start_date'] = array(
+		'handle'	=> 'cww_event_start_date',
 		'title' 	=> __('Start Date'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_event',
-		'context'	=> 'advanced',
-		'priority'	=> 'high',
 		'args'		=> array(
 			'type' 		=> 'date',
 			'class' 	=> 'datepicker',
-			'desc' 		=> __("Please choose the event's start date.", 'cww'),
+			'desc' 		=> $desc,
 			'req'		=> true,
 			'default' 	=> date('m-d-Y'),
 		)
 	);
 	// Start time
+	$desc = __("Please enter the event's start time.", 'cww');
+	$desc .= '<br /><strong>Shortcode:</strong> [eventstarttime]';
 	$default_mins = floor(date('i') / 15) * 15;
 	$default_mins = $default_mins ? $default_mins : '00';
 	$default_start = date('h') . ':' . $default_mins . date('A');
-	$meta_boxes['cww_event_start_time'] = array(
+	$meta_boxes['cww_event_details']['cww_event_start_time'] = array(
 		'handle'	=> 'cww_event_start_time',
 		'title' 	=> __('Start Time'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_event',
-		'context'	=> 'advanced',
-		'priority'	=> 'high',
 		'args'		=> array(
 			'type' 		=> 'time',
 			'class' 	=> 'time',
-			'desc' 		=> __("Please enter the event's start time.", 'cww'),
+			'desc' 		=> $desc,
 			'req'		=> true,
 			'default' 	=> $default_start,
 		)
 	);
 	// End date
-	$meta_boxes['cww_event_end_date'] = array(
+	$desc = __("Please choose the event's end date.", 'cww');
+	$desc .= '<br /><strong>Shortcode:</strong> [eventenddate format="PHP Date format"]<br />';
+	$desc .= 'The default format is "Monday, January 12th, 2014".  See <a href="http://php.net/manual/en/function.date.php">here</a> for more information about PHP Date formats.';
+	$meta_boxes['cww_event_details']['cww_event_end_date'] = array(
 		'handle'	=> 'cww_event_end_date',
 		'title' 	=> __('End Date'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_event',
-		'context'	=> 'advanced',
-		'priority'	=> 'high',
 		'args'		=> array(
 			'type' 		=> 'date',
 			'class' 	=> 'datepicker',
-			'desc' 		=> __("The ending date of the event (defaults to 'Start Date').", 'cww'),
+			'desc' 		=> $desc,
 			'default' 	=> date('m-d-Y'),
 		)
 	);
 	// End time
+	$desc = __("Please enter the event's end time.", 'cww');
+	$desc .= '<br /><strong>Shortcode:</strong> [eventendtime]';
 	$default_end = date('h:i A', strtotime($default_start)+60*60);
-	$meta_boxes['cww_event_end_time'] = array(
+	$meta_boxes['cww_event_details']['cww_event_end_time'] = array(
 		'handle'	=> 'cww_event_end_time',
 		'title' 	=> __('End Time'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_event',
-		'context'	=> 'advanced',
-		'priority'	=> 'high',
 		'args'		=> array(
 			'type' 		=> 'time',
 			'class' 	=> 'time',
-			'desc' 		=> __("Please enter the event's end time (defaults to 4 hours after 'End Date').", 'cww'),
+			'desc' 		=> $desc,
 			'default' 	=> $default_end,
 		)
 	);
 	
-	$meta_boxes['cww_event_location'] = array(
+	$desc = __("Please enter the event's location/address.", 'cww');
+	$desc .= '<br /><strong>Shortcode:</strong> [eventlocation]';
+	$meta_boxes['cww_event_details']['cww_event_location'] = array(
 		'handle'	=> 'cww_event_location',
 		'title' 	=> __('Location'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_event',
-		'context'	=> 'advanced',
-		'priority'	=> 'high',
 		'args'		=> array(
 			'type' 		=> 'textarea',
 			'class' 	=> 'location',
-			'desc' 		=> __("Please enter the event's location/address.", 'cww'),
+			'desc' 		=> $desc,
 			'default' 	=> 'TBD',
 		)
 	);
 	
-	$meta_boxes['cww_event_register_btn_url'] = array(
-		'handle'	=> 'cww_event_register_btn_url',
-		'title' 	=> __('Registration Link'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_event',
-		'context'	=> 'advanced',
-		'priority'	=> 'high',
+	$desc = __("Please enter the URL for the event's registration form.", 'cww');
+	$desc .= '<br /><strong>Shortcode:</strong> [eventregbtn class="css-class-1 css-class-2"]Link Text[/regbtn]';
+	$meta_boxes['cww_event_details']['cww_event_reg_btn_url'] = array(
+		'handle'	=> 'cww_event_reg_btn_url',
+		'title' 	=> __('Registration form URL'),
 		'args'		=> array(
 			'type' 		=> 'text',
 			'class' 	=> 'url',
-			'desc' 		=> __("Please enter the url for the event's registration button.  Leave blank to skip adding a registration button to this event.", 'cww'),
-			'default' 	=> '',
-		)
-	);
-	
-	$meta_boxes['cww_event_register_btn_text'] = array(
-		'handle'	=> 'cww_event_register_btn_text',
-		'title' 	=> __('Registration Text'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_event',
-		'context'	=> 'advanced',
-		'priority'	=> 'high',
-		'args'		=> array(
-			'type' 		=> 'text',
-			'desc' 		=> __("Please enter the text for the event's registration button (i.e. 'Register').", 'cww'),
+			'desc' 		=> $desc,
 			'default' 	=> '',
 		)
 	);

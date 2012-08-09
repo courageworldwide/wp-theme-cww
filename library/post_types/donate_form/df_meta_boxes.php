@@ -1,14 +1,11 @@
 <?php
 function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 	$meta_boxes = array();
+	$meta_boxes['cww_df_settings'] = array();
 	// Confirmation post ID
-	$meta_boxes['cww_df_conf_post_id'] = array(
+	$meta_boxes['cww_df_settings']['cww_df_conf_post_id'] = array(
 		'handle'	=> 'cww_df_conf_post_id',
 		'title' 	=> __('Success Post ID'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_donate_form',
-		'context'	=> 'advanced',
-		'priority'	=> 'default',
 		'args'		=> array(
 			'type' 		=> 'text',
 			'class' 	=> 'numeric',
@@ -17,13 +14,9 @@ function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 		)
 	);
 	// Confirmation email post ID
-	$meta_boxes['cww_df_conf_mail_post_id'] = array(
+	$meta_boxes['cww_df_settings']['cww_df_conf_mail_post_id'] = array(
 		'handle'	=> 'cww_df_conf_mail_post_id',
 		'title' 	=> __('Success Email Post ID'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_donate_form',
-		'context'	=> 'advanced',
-		'priority'	=> 'default',
 		'args'		=> array(
 			'type' 		=> 'text',
 			'class' 	=> 'numeric',
@@ -32,13 +25,9 @@ function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 		)
 	);
 	// Monthly donation duration
-	$meta_boxes['cww_df_monthly_duration'] = array(
+	$meta_boxes['cww_df_settings']['cww_df_monthly_duration'] = array(
 		'handle'	=> 'cww_df_monthly_duration',
 		'title' 	=> __('Monthly Donation Duration'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_donate_form',
-		'context'	=> 'advanced',
-		'priority'	=> 'default',
 		'args'		=> array(
 			'type' 		=> 'text',
 			'class' 	=> 'numeric',
@@ -47,13 +36,9 @@ function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 		)
 	);
 	// Annual donation duration
-	$meta_boxes['cww_df_annual_duration'] = array(
+	$meta_boxes['cww_df_settings']['cww_df_annual_duration'] = array(
 		'handle'	=> 'cww_df_annual_duration',
 		'title' 	=> __('Annual Donation Duration'),
-		'callback'	=> false,
-		'post_type'	=> 'cww_donate_form',
-		'context'	=> 'advanced',
-		'priority'	=> 'default',
 		'args'		=> array(
 			'type' 		=> 'text',
 			'class' 	=> 'numeric',
@@ -64,13 +49,9 @@ function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 	
 	if ( $mailchimp ) {
 		// Mailchimp List ID
-		$meta_boxes['cww_df_mc_list_id'] = array(
+		$meta_boxes['cww_df_settings']['cww_df_mc_list_id'] = array(
 			'handle'	=> 'cww_df_mc_list_id',
 			'title' 	=> __('Mailchimp List ID'),
-			'callback'	=> false,
-			'post_type'	=> 'cww_donate_form',
-			'context'	=> 'advanced',
-			'priority'	=> 'default',
 			'args'		=> array(
 				'type' 		=> 'text',
 				'desc' 		=> __("Please enter the ID of the Mailchimp list to which you'd like to add users who complete this form.  Leave blank to disable Mailchimp sign-up on this form.", 'cww'),
@@ -80,13 +61,9 @@ function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 	}
 	
 	if ( $highrise ) {
-		$meta_boxes['cww_df_update_hr'] = array(
+		$meta_boxes['cww_df_settings']['cww_df_update_hr'] = array(
 			'handle'	=> 'cww_df_update_hr',
 			'title'		=> __('Update Highrise'),
-			'callback'	=> false,
-			'post_type'	=> 'cww_donate_form',
-			'context'	=> 'advanced',
-			'priority'	=> 'default',
 			'args'		=> array(
 				'type'		=> 'checkbox',
 				'desc'		=> __("Choose whether or not to update the Highrise database with the user and donation data upon completion of this form.", 'cww'),

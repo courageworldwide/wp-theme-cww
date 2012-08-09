@@ -25,6 +25,14 @@ $cww_df_post_type = array(
 		'show_in_nav_menus' => false,
 		'menu_position' => 20,
 		'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'page-attributes', 'post-formats')
+	),
+	'meta_box_groups' => array(
+		'cww_df_settings' => array(
+			'handle' => 'cww_df_settings',
+			'title' => __('Donate Form Settings'),
+			'priority' => 'high',
+			'context' => 'normal'
+		),
 	)
 );
 $cww_df_meta_boxes = cww_df_meta_boxes(cww_df_mailchimp_is_enabled(), cww_df_highrise_is_enabled());

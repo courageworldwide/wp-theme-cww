@@ -1,4 +1,9 @@
 <?php
+/************************************************************************************ 
+/* Definition and functions for Event custom post type.
+/*
+/* By Jesse Rosato, 2012 - jesse.rosato@gmail.com
+/************************************************************************************/
 require_once($_SERVER['DOCUMENT_ROOT'] . '/wp-content/themes/cww/library/utilities/CwwPostTypeEngine.class.php');
 require_once('event_meta_boxes.php');
 
@@ -17,13 +22,24 @@ $cww_event_post_type = array(
 			'not_found' => __( 'No Events found' ),
 			'not_found_in_trash' => __( 'No Events found in trash' )
 		),
+		'singular_label' => __('event', 'cww'),
 		'description' => __( 'Create an event, with start date and time, etc.' ),
 		'rewrite' => array('slug' => 'events','with_front' => false),
 		'public' => true,
+		'publicly_queryable' => true,
 		'has_archive' => true,
 		'show_in_nav_menus' => false,
 		'menu_position' => 20,
 		'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'page-attributes', 'post-formats')
+	),
+	'meta_box_groups' => array(
+		'cww_event_details' => array(
+			'handle' => 'cww_event_details',
+			'title' => __('Event Details'),
+			'desc' => __('You can use the data entered below via shortcodes. Click the "[+] more info" link on a setting to see an example of its associated shortcode.', 'cww'),
+			'priority' => 'high',
+			'context' => 'normal'
+		),
 	)
 );
 $cww_event_meta_boxes = cww_event_meta_boxes();
@@ -31,6 +47,12 @@ $cww_event_post_type_engine = new CwwPostTypeEngine($cww_event_post_type, $cww_e
 add_action('init', array(&$cww_event_post_type_engine, 'create_post_type'));
 add_action('admin_init', array(&$cww_event_post_type_engine, 'add_meta_boxes'));
 
+
+/************************************************************************************ 
+/* Validate and save post meta data.
+/*
+/* @param int $post_id
+/************************************************************************************/
 add_action( 'save_post', 'cww_event_save_post');
 function cww_event_save_post( $post_id ) {
 	$post = get_post($post_id);
@@ -50,13 +72,56 @@ function cww_event_save_post( $post_id ) {
         return;
 	
 	foreach ( $_POST as $key => $value ) {
-		$args = $meta_boxes[$key]['args'];
 		if ( preg_match( '/^cww_event_.*/', $key ) ) {
 			// Times
 			if (is_array($value)) {
-				$value = $value[1] . ':' . $value[2] . ' ' . $value[3];
+				$value = $value[1] . ':' . $value[2] . $value[3];
 			}
 			update_post_meta( $post_id, $key, trim( $value ) );
 		}
 	}
+}
+
+add_shortcode( 'eventstartdate', 'cww_event_startdate_shortcode_callback' );
+function cww_event_startdate_shortcode_callback( $atts, $content = null ) {
+	$post = $GLOBALS['post'];
+	$format = empty($atts['format']) ? 'l, F jS, Y' : $atts['format'];
+	$start_date = get_post_meta($post->ID, 'cww_event_start_date', true);
+	return date($format, strtotime($start_date));
+}
+
+add_shortcode( 'eventstarttime', 'cww_event_starttime_shortcode_callback');
+function cww_event_starttime_shortcode_callback( $atts, $content = null ) {
+	$post = $GLOBALS['post'];
+	return (get_post_meta($post->ID, 'cww_event_start_time', true) . 'm');
+}
+
+add_shortcode( 'eventenddate', 'cww_event_enddate_shortcode_callback' );
+function cww_event_enddate_shortcode_callback( $atts, $content = null ) {
+	$post = $GLOBALS['post'];
+	$format = empty($atts['format']) ? 'l, F jS, Y' : $atts['format'];
+	$end_date = get_post_meta($post->ID, 'cww_event_end_date', true);
+	return date($format, strtotime($end_date));
+}
+
+add_shortcode( 'eventendtime', 'cww_event_endtime_shortcode_callback');
+function cww_event_endtime_shortcode_callback( $atts, $content = null ) {
+	$post = $GLOBALS['post'];
+	return (get_post_meta($post->ID, 'cww_event_end_time', true) . 'm');
+}
+
+add_shortcode( 'eventlocation', 'cww_event_location_shortcode_callback');
+function cww_event_location_shortcode_callback( $atts, $content = null ) {
+	$post = $GLOBALS['post'];
+	return get_post_meta($post->ID, 'cww_event_location', true);
+}
+
+add_shortcode( 'eventregbtn', 'cww_event_regbtn_shortcode_callback');
+function cww_event_regbtn_shortcode_callback( $atts, $content = null ) {
+	$post = $GLOBALS['post'];
+	$url = get_post_meta($post->ID, 'cww_event_reg_btn_url', true);
+	$url = $url ? $url : '#';
+	$class = empty( $atts['class'] ) ? 'button gray small' : $atts['class'];
+	$content = $content ? $content : 'Register';
+	return '<a href="' . $url . '" class="' . $class . '"><span>' . $content . '</span></a>';
 }
