@@ -7,3 +7,8 @@ This theme is designed for use by Courage Worldwide websites.
 It includes several custom post types:
 	- Donate form
 	- Event
+	
+VERSION HISTORY
+1.0.0
+- Issue 1.0.0.a
+  - Add autocomplete for cww_df_conf_post_id and cww_df_conf_mail_post_id meta boxes.
