@@ -158,8 +158,7 @@ form.donate #cc-logos {
 	padding-bottom: 8px;
 }
 
-#df_submit.disabled,
-#cancel-donate.disabled {
+.button.disabled {
 	-moz-box-shadow: none !important;
 	-webkit-box-shadow: none !important;
 	box-shadow: none !important;
@@ -167,11 +166,15 @@ form.donate #cc-logos {
 	background-color: #EEEEEE;
 }
 
-#df_submit.disabled:hover,
-#cancel-donate.disabled:hover {
+.button.disabled:hover,
+.button.disabled:active {
+	cursor: default;
 	-moz-box-shadow: none !important;
 	-webkit-box-shadow: none !important;
 	box-shadow: none !important;
 	color: #CCCCCC;
-	background-color: #EEEEEE;
+	background: none !important;
+	filter: none !important;
+	-ms-filter: none !important;
+	background-color: #EEEEEE !important;
 }
