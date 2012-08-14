@@ -70,13 +70,13 @@ function cww_event_save_post( $post_id ) {
     // Check if the current user has permission to edit this post-type.
     if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
         return;
-	
 	foreach ( $_POST as $key => $value ) {
 		if ( preg_match( '/^cww_event_.*/', $key ) ) {
 			// Times
 			if (is_array($value)) {
 				$value = $value[1] . ':' . $value[2] . $value[3];
 			}
+			error_log("$key: $value");
 			update_post_meta( $post_id, $key, trim( $value ) );
 		}
 	}
@@ -87,6 +87,7 @@ function cww_event_startdate_shortcode_callback( $atts, $content = null ) {
 	$post = $GLOBALS['post'];
 	$format = empty($atts['format']) ? 'l, F jS, Y' : $atts['format'];
 	$start_date = get_post_meta($post->ID, 'cww_event_start_date', true);
+	error_log(print_r(date_parse($start_date),true));
 	return date($format, strtotime($start_date));
 }
 
@@ -122,6 +123,6 @@ function cww_event_regbtn_shortcode_callback( $atts, $content = null ) {
 	$url = get_post_meta($post->ID, 'cww_event_reg_btn_url', true);
 	$url = $url ? $url : '#';
 	$class = empty( $atts['class'] ) ? 'button gray small' : $atts['class'];
-	$content = $content ? $content : 'Register';
+	$content = empty( $content ) ? 'Register' : $content;
 	return '<a href="' . $url . '" class="' . $class . '"><span>' . $content . '</span></a>';
 }

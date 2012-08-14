@@ -1,21 +1,11 @@
 jQuery(document).ready(function($) {
 	$(".datepicker").datepicker({ 
-		dateFormat: 'mm-dd-yy',
+		dateFormat: 'yyyy-mm-dd',
 		onClose:function(dateText, inst) {
 			var start = $('#cww_event_start_date-input').datepicker('getDate');
 			var end = $('#cww_event_end_date-input').datepicker('getDate');
 			if (end < start) {
 				$('#cww_event_end_date-input').datepicker('setDate', start);
-			}
-		}
-	});
-	
-	$('.datepicker').datepicker({
-		onClose:function(dateText, inst) {
-			var start = $('#cww_event_start_date-input').datepicker('getDate');
-			var end = $('#cww_event_end_date-input').datepicker('getDate');
-			if (end < start) {
-				$('#cww_event_end_date-input').datepickert('setDate', start);
 			}
 		}
 	});

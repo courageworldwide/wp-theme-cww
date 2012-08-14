@@ -20,7 +20,7 @@ function cww_event_meta_boxes() {
 			'class' 	=> 'datepicker',
 			'desc' 		=> $desc,
 			'req'		=> true,
-			'default' 	=> date('m-d-Y'),
+			'default' 	=> date('Y-m-d'),
 		)
 	);
 	// Start time
@@ -51,7 +51,7 @@ function cww_event_meta_boxes() {
 			'type' 		=> 'date',
 			'class' 	=> 'datepicker',
 			'desc' 		=> $desc,
-			'default' 	=> date('m-d-Y'),
+			'default' 	=> date('Y-m-d'),
 		)
 	);
 	// End time
@@ -83,7 +83,7 @@ function cww_event_meta_boxes() {
 	);
 	
 	$desc = __("Please enter the URL for the event's registration form.", 'cww');
-	$desc .= '<br /><strong>Shortcode:</strong> [eventregbtn class="css-class-1 css-class-2"]Link Text[/regbtn]';
+	$desc .= '<br /><strong>Shortcode:</strong> [eventregbtn class="css-class-1 css-class-2"]Link Text[/eventregbtn]';
 	$meta_boxes['cww_event_details']['cww_event_reg_btn_url'] = array(
 		'handle'	=> 'cww_event_reg_btn_url',
 		'title' 	=> __('Registration form URL'),
