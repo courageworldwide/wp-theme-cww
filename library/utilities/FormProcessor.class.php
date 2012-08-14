@@ -127,7 +127,7 @@ class FormProcessor {
 	public function validate_currency( $cur, $key = 'price' ) {
 		$filter_options = array('options' => array('regexp' => '/^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$/'));
 		if ( !filter_var( $cur, FILTER_VALIDATE_REGEXP, $filter_options ) ) {
-			$this->errors[$df_amount_field] = 'format';
+			$this->errors[$key] = 'format';
 			return false;
 		}
 		return true;

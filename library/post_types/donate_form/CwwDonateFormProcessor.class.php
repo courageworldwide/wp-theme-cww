@@ -50,6 +50,8 @@ class CwwDonateFormProcessor extends FormProcessor {
 			$this->meta_data['org']				= get_bloginfo('name');
 			$this->meta_data['org_mail']		= get_bloginfo('admin_email');
 		}
+		$this->meta_data['monthly_duration'] 	= get_post_meta($this->post_id, 'cww_df_monthly_duration', true);
+		$this->meta_data['annual_duration'] 	= get_post_meta($this->post_id, 'cww_df_annual_duration', true);
 		$this->meta_data['mc_list_id']			= get_post_meta($this->post_id, 'cww_df_mc_list_id', true);
 		$this->meta_data['hr_update']			= get_post_meta($this->post_id, 'cww_df_update_hr', true);
 		$this->meta_data['conf_post_id']		= get_post_meta($this->post_id, 'cww_df_conf_post_id', true);
@@ -58,6 +60,7 @@ class CwwDonateFormProcessor extends FormProcessor {
 			$this->meta_data['conf_post_id'] = $this->post_id;
 		if ( !is_numeric( $this->meta_data['conf_mail_post_id'] ) ) 
 			$this->meta_data['conf_mail_post_id'] = $this->meta_data['conf_post_id'];
+			
 		return $this->meta_data;
 	} // end set_meta_data()
 	
@@ -270,7 +273,7 @@ class CwwDonateFormProcessor extends FormProcessor {
 				}
 			}
 		}
-		return $response;
+		return $result;
 	} // end proces_payment()
 	
 	/************************************************************************************ 
@@ -309,12 +312,11 @@ class CwwDonateFormProcessor extends FormProcessor {
 	public function submit_recurring_donation() {
 		$request = new AuthorizeNetARB($this->data['authnet']['login'], $this->data['authnet']['key']);
 		
-		if (preg_match('/(month)|(business)/', $this->data['donation']['type'])) {
-			$this->data['donation']['interval_unit'] = "months";
-			$this->data['donation']['occurrences']	 = $this->meta_data['cww_monthly_duration'];
+		$this->data['donation']['interval_unit'] = "months";
+		if (preg_match('/(month)|(business)/i', $this->data['donation']['type'])) {
+			$this->data['donation']['occurrences']	 = $this->meta_data['monthly_duration'];
 		} else {
-			$this->data['donation']['interval_unit'] = "years";
-			$this->data['donation']['occurrences']	 = $this->meta_data['cww_annual_duration'];
+			$this->data['donation']['occurrences']	 = 12 * $this->meta_data['annual_duration'];
 		}
 		
 		// Set the subscription fields.
@@ -357,25 +359,27 @@ class CwwDonateFormProcessor extends FormProcessor {
 	public function submit_data_to_highrise() {
 		if ( empty( $this->meta_data['hr_update'] ) )
 			return false;
-
 		// Process Highrise transaction data.		
 		$type = $this->data['donation']['type_code'] == 'business' ? 'monthly' : $this->data['donation']['type_code'];
 		if ($type == 'monthly')
-			$duration = $monthly_duration;
+			$duration = $this->meta_data['monthly_duration'];
 		if ($type == 'annual')
-			$duration = $annual_duration;
+			$duration = $this->meta_data['annual_duration'];
+		if (empty($duration))
+			$duration = 0;
 		if ($type != 'onetime')
 			$start = $this->data['donation']['start_date'];
 		$hr_transaction	= array(
 			'id' => (isset($this->data['donation']['transaction_id']) ? $this->data['donation']['transaction_id'] : $this->data['donation']['subscription_id']),
 			'source' => $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
 			'pay_method' => $this->card_type($this->data['card']['num']),
+			'card_exp' => $this->data['card']['exp'],
 			'account' => 'Auth.net',
 			'products' => array(
 				0 => array(
 					'amount' => $this->data['donation']['amount'],
 					'type' => $type,
-					'duration' => isset($duration) ? $duration : 0
+					'duration' => $duration
 				),
 			),
 		);
@@ -516,7 +520,7 @@ class CwwDonateFormProcessor extends FormProcessor {
 		if ( empty( $data ) || !is_array( $data ) )
 			$data = $this->data;
 			
-		$transaction_id = $data['donation']['transaction_id'] ? $data['donation']['transaction_id'] : $data['donation']['subscription_id'];
+		$transaction_id = empty( $data['donation']['transaction_id'] ) ? $data['donation']['subscription_id'] : $data['donation']['transaction_id'];
 		$text = str_replace('%transaction_id', $transaction_id, $text);
 		$text = str_replace('%donation_type', $data['donation']['type'], $text);
 		$name = $data['donor']['first_name'] . ' ' . $data['donor']['last_name'];

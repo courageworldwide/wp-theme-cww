@@ -158,7 +158,17 @@ form.donate #cc-logos {
 	padding-bottom: 8px;
 }
 
-#df_submit.disabled {
+#df_submit.disabled,
+#cancel-donate.disabled {
+	-moz-box-shadow: none !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	color: #CCCCCC;
+	background-color: #EEEEEE;
+}
+
+#df_submit.disabled:hover,
+#cancel-donate.disabled:hover {
 	-moz-box-shadow: none !important;
 	-webkit-box-shadow: none !important;
 	box-shadow: none !important;

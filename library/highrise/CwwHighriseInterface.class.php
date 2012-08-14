@@ -92,7 +92,8 @@ class CwwHighriseInterface {
 		// Add user comments as a note.
 		$notes = isset($notes) ? trim($notes) : FALSE;
 		if ($notes) {
-			$this->addNote($notes, $person);
+			$note = "Note from " . $person->getFirstName() . " " . $person->getLastName() . ": " . $notes;
+			$this->addNote($note, $person);
 		}
 		
 		return $person;
@@ -110,6 +111,7 @@ class CwwHighriseInterface {
 	 *		- source* (e.g. http://transactionsite.com)
 	 *		- pay_method* (e.g. VISA, MC, AMEX, etc...)
 	 *		- account* (account the payment is going to, i.e. 'Auth.net')
+	 *		- card_exp (card expiration date, for recurring donations task)
 	 *		- products
 	 *			- amount
 	 *			- name
@@ -138,59 +140,86 @@ class CwwHighriseInterface {
 		$i = 0;
 		foreach ($products as $product) {
 			// - Deal
-			$product_name = isset($product['name']) ? $product['name'] : 'N/A';
-			$product_quantity	= isset($product['quantity']) ? $product['quantity'] : '1';
+			$url_parts = parse_url($source);
+			unset($url_parts['query']);
+			$url = implode('', $url_parts);
+			$product_name = isset($product['name']) ? $product['name'] : false;
+			$product_quantity	= isset($product['quantity']) ? 'Qty: ' . $product['quantity'] : false;
 			$deal_name_parts = array(
 				'Online donation',
-				$source, 
+				preg_replace('/[?].*/', '', $source), 
 				$pay_method, 
 				$account, 
 				$id,
 				$product_name,
-				'Qty: ' . $product_quantity,
+				$product_quantity,
 			);
-			$result[$i]['deal'] = $this->addDeal(implode(' | ', $deal_name_parts), $product, $person);
+			foreach ($deal_name_parts as $key => $val) {
+				if (!$val)
+					unset($deal_name_parts[$key]);
+			}
+			$deal_name = implode(' | ', $deal_name_parts);
+			$result[$i]['deal'] = $this->addDeal($deal_name, $product, $person);
 			
 			// - Note 
 			$name 				= $person->getFirstName() . ' ' . $person->getLastName();
 			$product_type 		= ucfirst($product['type']) . ' Donation';
 			$product_category 	= isset($product['category']) ? $product['category'] : 'General donation';
-			$task_delay			= $this->_config['task_delay'];
 			$datetime			= date('n-d-Y H:i');
 			if (!(isset($product['start_date'])) || !$product['start_date']) {
 				if ($product['type'] == 'onetime')
-					$start_date = 'N/A';
+					$start_date = false;
 				else
 					$start_date = date('n-d-Y');
 			} else {
-				$start_date = 'N/A';
+				$start_date = false;
 			}
 			$note_body_parts  = array(
-				"Online donation",
-				"Site: $source",
-				"Name: $name",
-				"Type: $product_type",
-				"Category: $product_category",
-				"Date and Time: $datetime",
-				"Start date: $start_date",
-				"Item: $product_name",
-				"Quantity: $product_quantity",
+				"Site" => $url,
+				"Name" => $name,
+				"Type" => $product_type,
+				"Category" => $product_category,
+				"Date and Time" => $datetime,
+				"Start date" => $start_date,
+				"Item" => $product_name,
+				"Quantity" => $product_quantity
 			);
-			$result[$i]['note'] = $this->addNote(implode(', ', $note_body_parts), $person);
+			$note_body = array("Online Donation");
+			foreach ($note_body_parts as $key => $val) {
+				if ($val)
+					$note_body[] = "$key: $val";
+			}
+			$result[$i]['note'] = $this->addNote(implode(', ', $note_body), $person);
 			
 			// - Task
+			$task_delay	= $this->_config['task_delay'];
 			if ($product['type'] == 'monthly' || $product['type'] == 'annual') {
+				// Set reminder task about deal expiration.
 				$start_date = isset($product['start_date']) && $product['start_date'] ? $product['start_date'] : date('Y-m-d');
-				// Set deal expiration using years or months according to 'type'
 				if ($product['type'] == 'monthly')
-					$exp_date = date('n/d/Y', strtotime($start_date . "+" . $product['duration'] . " months"));
+					$exp_timestamp = strtotime($start_date . "+" . $product['duration'] . " months");
 				if ($product['type'] == 'annual')
-					$exp_date = date('n/d/Y', strtotime($start_date . "+" . $product['duration'] . " years"));
-				$due_date = date('Y-m-d', strtotime($start_date . "+" . $task_delay));
+					$exp_timestamp = strtotime($start_date . "+" . $product['duration'] . " years");	
+				$exp_date = date('n/d/Y', $exp_timestamp);
+
+				$due_date = date('Y-m-d', strtotime($start_date . "+" . $task_delay)) . 'T10:00:00-08:00';
 				$task_body = 'Follow up on recurring donation, made ';
 				$task_body .= $task_delay;
 				$task_body .= " ago.  Donation expires on $exp_date.";
-				$result[$i]['task'] = $this->addTask($task_body, $due_date, $result[$i]['deal']);
+				$result[$i]['tasks'][] = $this->addTask($task_body, $due_date, $result[$i]['deal']);
+				// Set reminder task if card expires before deal does.
+				// Use the 1st, because most cards expire on last day of expiration month.
+				if (!empty($transaction['card_exp'])) {
+					$card_exp  = '20' . substr($transaction['card_exp'], 2, 2) . '/';
+					$card_exp .= substr($transaction['card_exp'], 0, 2) . '/01';
+					
+					$card_exp_timestamp = strtotime($card_exp);
+					if ($card_exp_timestamp < $exp_timestamp) {
+						$task_body = 'The credit card used for recurring donation expires this month.';
+						$due_date = date('Y-m-d', $card_exp_timestamp) . 'T10:00:00-08:00';
+						$result[$i]['tasks'][] = $this->addTask($task_body, $due_date, $result[$i]['deal']);
+					}
+				}
 			}
 			
 			// Increment counter
@@ -224,13 +253,16 @@ class CwwHighriseInterface {
 	 * Returns true if new address, false if existing.
 	/****************************************************************************************/
 	public function isNewAddress($street, $zip, HighrisePerson $person) {
-		$is_new = TRUE;
-		$street = strtolower($street);
+		$is_new		= TRUE;
+		$street		= preg_replace('/[^a-zA-Z0-9 ]/', '', strtolower($street));
+		$zip		= preg_replace('/[^0-9]/', '', strtolower($zip));
 		$addresses	= $person->getAddresses();
 		if (!count($addresses))
 			return $is_new;
 		foreach($addresses as $address) {
-			if ((strtolower($address->getStreet()) == $street) && ($address->getZip() == $zip))
+			$cur_street = preg_replace('/[^a-zA-Z0-9 ]/', '', strtolower($address->getStreet()));
+			$cur_zip	= preg_replace('/[^0-9]/', '', strtolower($address->getZip()));
+			if (($cur_street == $street) && ($cur_zip == $zip))
 				$is_new = FALSE;
 		}
 		return $is_new;
@@ -246,7 +278,8 @@ class CwwHighriseInterface {
 		if (!count($phones))
 			return $is_new;
 		foreach ($phones as $phone) {
-			if ($phone->getNumber() == $phone_number)
+			$cur_num = preg_replace('/[^0-9]/', '', $phone->getNumber());
+			if ($cur_num == $phone_number)
 				$is_new = FALSE;
 		}
 		return $is_new;

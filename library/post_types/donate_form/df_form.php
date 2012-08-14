@@ -15,7 +15,7 @@
   <?php } ?>
    <input type="radio" name="df_type" value="monthly" <?php echo (isset($df_clean['df_type']) && $df_clean['df_type'] == 'monthly' ? 'checked="checked"' : ''); ?> />
    <label for="df_type" class="radio option">Monthly Partner</label>
-   <input type="radio" name="df_type" value="annually" <?php echo (isset($df_clean['df_type']) && $df_clean['df_type'] == 'annually' ? 'checked="checked"' : ''); ?> />
+   <input type="radio" name="df_type" value="annual" <?php echo (isset($df_clean['df_type']) && $df_clean['df_type'] == 'annual' ? 'checked="checked"' : ''); ?> />
    <label for="df_type" class="radio option">Annual Donation</label>
    <input type="radio" name="df_type" value="business" <?php echo (isset($df_clean['df_type']) && $df_clean['df_type'] == 'business' ? 'checked="checked"' : ''); ?> />
    <label for="df_type" class="radio option">Business Partner</label>
@@ -37,17 +37,17 @@
     </div>
     <div class="info">$25 or more per month commitment qualifies you for the Courage Partner program.</div>
    </div><!-- end #monthly-wrap !-->
-   <div id="annual-wrap" class="amount-wrap" <?php echo ((!isset($df_clean['df_type'])) || ($df_clean['df_type'] != 'annually') ? 'style="display: none;"' : ''); ?>>
-    <?php if (isset($df_errors['df_amount_annually'])) : ?>
-     <div class="error message amount-annually">
-      <?php echo $df_error_msgs['df_amount_annually'][$df_errors['df_amount_annually']]; ?>
+   <div id="annual-wrap" class="amount-wrap" <?php echo ((!isset($df_clean['df_type'])) || ($df_clean['df_type'] != 'annual') ? 'style="display: none;"' : ''); ?>>
+    <?php if (isset($df_errors['df_amount_annual'])) : ?>
+     <div class="error message amount-annual">
+      <?php echo $df_error_msgs['df_amount_annual'][$df_errors['df_amount_annual']]; ?>
      </div>
     <?php endif; ?>
     <div id="amount-annually-wrap" class="input-wrap text">
-     <label for="df_amount_annually">
+     <label for="df_amount_annual">
       <span class="required">*</span>Annual Donation Amount - Enter amount: $
      </label>
-     <input id="df_amount_annually" value="<?php echo (isset($df_clean['df_amount_annually']) ? $df_clean['df_amount_annually'] : ''); ?>" type="text" name="df_amount_annually" size="10" />
+     <input id="df_amount_annual" value="<?php echo (isset($df_clean['df_amount_annual']) ? $df_clean['df_amount_annual'] : ''); ?>" type="text" name="df_amount_annual" size="10" />
     </div>
     <div class="info">
      $300 or more per year commitment qualifies you for the Courage Partner program.

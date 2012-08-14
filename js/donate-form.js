@@ -1,8 +1,4 @@
 jQuery(document).ready(function($) {;
-	// Donate form client-side validation
-	$('#donateform').submit(function(){
-		// Client-side validation goes here.
-	}); // donate_submit
 	
 	// Display the appropriate donation wrapper if a donation type has been selected.
 	displayDonationWrapper($("input[name='df_type']:checked").val());
@@ -25,6 +21,8 @@ jQuery(document).ready(function($) {;
 	$('#donateform').submit(function() {
 		$('#df_submit').attr('disabled', 'disabled');
 		$('#df_submit').addClass('disabled');
+		$('#cancel-donate').attr('disabled', 'disabled');
+		$('#cancel-donate').addClass('disabled');
 		return true;
 	});
 
@@ -36,7 +34,7 @@ function displayDonationWrapper(donation_type) {
 			jQuery("#monthly-wrap").show();
 			jQuery(".date-wrap").show();
 			break;
-		case "annually":
+		case "annual":
 			jQuery("#annual-wrap").show();
 			jQuery(".date-wrap").show();
 			break;
