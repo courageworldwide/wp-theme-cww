@@ -1,11 +1,8 @@
 <?php
 $custom_post_types = array('cww_event', 'cww_associate');
 $post_type = get_post_type_object( $post->post_type );
-if ( in_array( $post_type->name, $custom_post_types ) ) {
-	$slug = $post_type->name;
-	$labels = $post_type->labels->name;
-	theme_set_option('advance','archive_' . $post_type->name . '_title', $name);
-}
+if ( in_array( $post_type->name, $custom_post_types ) )
+	theme_set_option('advance','archive_' . $post_type->name . '_title', $post_type->labels->name);
 $layout=theme_get_option('blog','layout');
 get_header(); ?>
 <?php theme_generator('introduce'); ?>
