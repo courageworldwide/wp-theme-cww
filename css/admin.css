@@ -18,11 +18,17 @@ label.error {
 #menu-posts-cww_event .wp-menu-image {
 	background: url(../images/event-post-type-icon.png) no-repeat 6px -18px !important;
 }
+
+#menu-posts-cww_associate .wp-menu-image {
+	background: url(../images/associate-post-type-icon.png) no-repeat 6px -18px !important;
+}
         
 #menu-posts-cww_donate_form:hover .wp-menu-image,
 #menu-posts-cww_donate_form.wp-has-current-submenu .wp-menu-image,
 #menu-posts-cww_event:hover .wp-menu-image,
-#menu-posts-cww_event.wp-has-current-submenu .wp-menu-image {
+#menu-posts-cww_event.wp-has-current-submenu .wp-menu-image,
+#menu-posts-cww_associate:hover .wp-menu-image,
+#menu-posts-cww_associate.wp-has-current-submenu .wp-menu-image {
 	background-position: 6px 6px !important;
 }
 
@@ -32,6 +38,10 @@ label.error {
 
 #icon-edit.icon32-posts-cww_event {
 	background: url(../images/event-post-type-icon-32x32.png) no-repeat;
+}
+
+#icon-edit.icon32-posts-cww_associate {
+	background: url(../images/associate-post-type-icon-32x32.png) no-repeat;
 }
 
 input.hours,

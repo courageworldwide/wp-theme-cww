@@ -7,6 +7,7 @@ if (is_admin())
 
 require_once('library/post_types/donate_form/df_post_type.php');
 require_once('library/post_types/event/event_post_type.php');
+require_once('library/post_types/associate/associate_post_type.php');
 
 add_action('wp_enqueue_scripts', 'cww_scripts');
 add_action('wp_enqueue_scripts', 'cww_styles');

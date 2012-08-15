@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
 	$(".datepicker").datepicker({ 
-		dateFormat: 'yyyy-mm-dd',
+		dateFormat: 'yy-mm-dd',
 		onClose:function(dateText, inst) {
 			var start = $('#cww_event_start_date-input').datepicker('getDate');
 			var end = $('#cww_event_end_date-input').datepicker('getDate');

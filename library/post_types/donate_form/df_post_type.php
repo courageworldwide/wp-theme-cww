@@ -40,9 +40,12 @@ $cww_df_post_type_engine = new CwwPostTypeEngine($cww_df_post_type, $cww_df_meta
 add_action('init', array(&$cww_df_post_type_engine, 'create_post_type'));
 add_action('admin_init', array(&$cww_df_post_type_engine, 'add_meta_boxes'));
 
-add_action( 'save_post', 'cww_df_save_post');
+add_action( 'save_post', 'cww_df_save_post' );
 function cww_df_save_post( $post_id ) {
 	$post = get_post($post_id);
+	// Make sure this is our post type.
+	if ( $post->post_type != 'cww_df' )
+		return;
 	// verify if this is an auto save routine. 
 	// If it is our form has not been submitted, so we dont want to do anything
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 

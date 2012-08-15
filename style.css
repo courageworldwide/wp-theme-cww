@@ -178,3 +178,34 @@ form.donate #cc-logos {
 	-ms-filter: none !important;
 	background-color: #EEEEEE !important;
 }
+
+.cww-event {
+	background-color: #EEEEEE;
+	border: 1px solid #CCCCCC;
+	border-radius: 4px;
+	padding: 0 16px 16px 16px;
+}
+
+.cww-event-description {
+}
+
+.cww-event-details {
+	clear: both;
+	padding-top: 16px;
+}
+
+.cww-event-title {
+	padding-top: 16px;
+}
+
+.cww-event-thumbnail {
+	float: right;
+	padding: 0 0 16px 16px;
+}
+
+.cww-associate-thumbnail {
+	float: left;
+	width: 150px;
+	height: auto;
+	padding: 0 16px 16px 0;
+}
