@@ -10,7 +10,7 @@
 <!-- Feeds and Pingback -->
 <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS2 Feed" href="<?php bloginfo('rss2_url'); ?>" />
 <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
-<!-- Courage Worldwide Theme styles !-->
+<!-- Courage Worldwide Theme styles -->
 <link rel="stylesheet" type="text/css" media="all" href="<?php bloginfo( 'stylesheet_url' ); ?>" />
 
 <?php wp_head(); ?>

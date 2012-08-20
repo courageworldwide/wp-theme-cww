@@ -70,9 +70,9 @@ class CwwHighriseInterface {
 		if (!$person) {
 			$found = FALSE;
 			$person = new HighrisePerson($this->_hr);
-			$person->setFirstName($first_name);
-			$person->setLastName($last_name);
-			$person->addEmailAddress($email, 'Home');
+			$person->setFirstName(trim(strtolower($first_name)));
+			$person->setLastName(trim(strtolower($last_name)));
+			$person->addEmailAddress(trim(strtolower($email)), 'Home');
 		}
 		
 		// Check whether optional user-entered fields exist.
@@ -237,8 +237,9 @@ class CwwHighriseInterface {
 	 * If all three match, return Highrise Person Object, else return false.
 	/****************************************************************************************/
 	public function loadPerson($first_name, $last_name, $email) {
-		$first_name = strtolower($first_name);
-		$last_name = strtolower($last_name);
+		$first_name = trim(strtolower($first_name));
+		$last_name = trim(strtolower($last_name));
+		$email = trim(strtolower($email));
 		$people = $this->_hr->findPeopleByEmail($email);
 		if (!count($people)) return FALSE;
 		foreach ($people as $person) {
