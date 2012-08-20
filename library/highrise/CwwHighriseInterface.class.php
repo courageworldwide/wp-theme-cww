@@ -70,8 +70,8 @@ class CwwHighriseInterface {
 		if (!$person) {
 			$found = FALSE;
 			$person = new HighrisePerson($this->_hr);
-			$person->setFirstName(trim(strtolower($first_name)));
-			$person->setLastName(trim(strtolower($last_name)));
+			$person->setFirstName(trim($first_name));
+			$person->setLastName(trim($last_name));
 			$person->addEmailAddress(trim(strtolower($email)), 'Home');
 		}
 		
