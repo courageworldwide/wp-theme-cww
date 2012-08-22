@@ -81,10 +81,14 @@ function cww_associate_register_taxonomy( ) {
 
 function cww_associate_content($type = 'single') {
 	$post = $GLOBALS['post'];
-	if ( $type == 'multi' )
-		$content = apply_filters('the_excerpt', $post->post_excerpt);
-	if ( empty( $content ) )
+	if ( $type == 'single' ) {
 		$content = apply_filters('the_content', $post->post_content);
+	} else {
+		$content = apply_filters('the_excerpt', $post->post_excerpt);
+		if ( empty( $content ) )
+			$content = apply_filters('the_content', $post->post_content);
+	}
+		
 	$first		= get_post_meta($post->ID, 'cww_associate_first_name', true);
 	$last		= get_post_meta($post->ID, 'cww_associate_last_name', true);
 	$org		= get_post_meta($post->ID, 'cww_associate_organization', true);
