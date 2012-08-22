@@ -146,7 +146,7 @@ class CwwHighriseInterface {
 			$product_name = isset($product['name']) ? $product['name'] : false;
 			$product_quantity	= isset($product['quantity']) ? 'Qty: ' . $product['quantity'] : false;
 			$deal_name_parts = array(
-				'Online donation',
+				'Donation form',
 				preg_replace('/[?].*/', '', $source), 
 				$pay_method, 
 				$account, 

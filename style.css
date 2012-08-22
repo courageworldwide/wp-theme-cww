@@ -183,7 +183,8 @@ form.donate #cc-logos {
 	background-color: #EEEEEE;
 	border: 1px solid #CCCCCC;
 	border-radius: 4px;
-	padding: 0 16px 16px 16px;
+	padding: 0 16px 0 16px;
+	margin-bottom: 32px;
 }
 
 .cww-event-description {
@@ -210,8 +211,13 @@ form.donate #cc-logos {
 	padding: 0 16px 16px 0;
 }
 
-.ways-you-can-help h4 img {
-	display: block;
+.ways-you-can-help h4 {
+	vertical-align: middle;
+	clear: both;
+}
+
+.ways-you-can-help img {
 	float: left;
-	margin: 0 16px 16px 0;
+	vertical-align: middle;
+	padding: 0 16px 16px 0;
 }

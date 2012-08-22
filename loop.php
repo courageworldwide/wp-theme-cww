@@ -58,19 +58,42 @@ if ($columns != 1) {
 		echo "<div class=\"one_{$css} last\">";
 	}
 }
+
+
+if ( get_post_type() == 'cww_event' ) {
+	$event_id = get_the_ID();
+	$event_is_over = cww_event_is_over( $event_id );
+	$after_post_id = get_post_meta($event_id, 'cww_event_after_post_id', true);
+	$orig_post = $post;
+	$post = $after_post_id && $event_is_over ? get_post($after_post_id) : get_post($event_id);
+}
+
 ?>
 <article id="post-<?php the_ID(); ?>" class="entry entry_<?php echo $featured_image_type;?><?php echo $frame_css;?>"> 
-	<div class="entry_content">
+<?php if($featured_image && $featured_image_type!=='below'){echo theme_generator('blog_featured_image',$featured_image_type,$layout,'',$frame);} ?>
+	<div class="entry_info">
+		<h2 class="entry_title"><a href="<?php echo get_permalink() ?>" rel="bookmark" title="<?php printf( __("Permanent Link to %s", 'striking_front'), get_the_title() ); ?>"><?php the_title(); ?></a></h2>
+		<div class="entry_meta">
+<?php echo theme_generator('blog_meta'); ?>
+		</div>
+	</div>
+<?php if($featured_image && $featured_image_type=='below'){echo theme_generator('blog_featured_image',$featured_image_type,$layout);} ?>
+		<div class="entry_content">
 <?php 
-	
 	if($display_full):
 		global $more;
 		$more = 0;
-		cww_event_content(get_the_ID());	
+		the_content(wpml_t(THEME_NAME, 'Blog Post Read More Button Text',stripslashes(theme_get_option('blog','read_more_text'))),false);
 	else:
-		cww_event_content(get_the_ID(), 'multi');
+		the_excerpt();
+		if(theme_get_option('blog','read_more_button')):?>
+			<a class="read_more_link <?php echo apply_filters( 'theme_css_class', 'button' );?> small" href="<?php the_permalink(); ?>" rel="nofollow"><span><?php echo wpml_t(THEME_NAME, 'Blog Post Read More Button Text',stripslashes(theme_get_option('blog','read_more_text')));?></span></a>
+	<?php else: ?>
+			<a class="read_more_link" href="<?php the_permalink(); ?>" rel="nofollow"><?php echo wpml_t(THEME_NAME, 'Blog Post Read More Button Text',stripslashes(theme_get_option('blog','read_more_text')));?></a>
+	<?php endif; 
 	endif;
 ?>
+		
 	</div>
 </article>
 <?php
@@ -81,6 +104,8 @@ if ($columns != 1) {
 		echo "<div class=\"clearboth\"></div>";
 	}
 }
+
+$post = empty($orig_post) ? $post : $orig_post;
 
 endwhile;
 wp_reset_postdata();

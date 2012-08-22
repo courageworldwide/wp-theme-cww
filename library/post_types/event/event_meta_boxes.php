@@ -108,5 +108,18 @@ function cww_event_meta_boxes() {
 		)
 	);
 	
+	$desc = __("Please enter the ID of the post you'd like to replace this event once this event has ended.  Leave this blank to continue to display the event as if it were still upcoming.", 'cww');
+	$meta_boxes['cww_event_details']['cww_event_after_post_id'] = array(
+		'handle'	=> 'cww_event_after_post_id',
+		'title' 	=> __('After-event Post ID'),
+		'args'		=> array(
+			'type' 		=> 'text',
+			'class' 	=> 'numeric',
+			'desc' 		=> $desc,
+			'default' 	=> '',
+		)
+	);
+
+	
 	return $meta_boxes;
 }
