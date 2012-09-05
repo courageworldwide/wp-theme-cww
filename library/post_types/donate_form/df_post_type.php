@@ -44,7 +44,7 @@ add_action( 'save_post', 'cww_df_save_post' );
 function cww_df_save_post( $post_id ) {
 	$post = get_post($post_id);
 	// Make sure this is our post type.
-	if ( $post->post_type != 'cww_df' )
+	if ( $post->post_type != 'cww_donate_form' )
 		return;
 	// verify if this is an auto save routine. 
 	// If it is our form has not been submitted, so we dont want to do anything

@@ -15,20 +15,6 @@ $cww_df_settings = array(
 	'contextual_help'	=> '',
 );
 
-$cww_df_scripts = array(
-	'css' => array(
-		'cww_theme_settings_css' => array(
-			'src' => get_stylesheet_directory_uri() . '/css/admin/theme-settings.css'
-		)
-	),
-	'js' => array(
-		'cww_theme_settings_js' => array(
-			'src' => get_stylesheet_directory_uri() . '/js/admin/theme-settings.js',
-			'deps' => array( 'jquery' )
-		)
-	)
-);
-
 $cww_df_settings_engine = new CwwSettingsEngine($cww_df_settings);
 add_action( 'admin_menu', array( &$cww_df_settings_engine, 'add_settings_page' ) );
 add_action( 'admin_init', array( &$cww_df_settings_engine, 'register_settings' ) );

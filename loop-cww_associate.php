@@ -65,9 +65,9 @@ if ($columns != 1) {
 	if($display_full):
 		global $more;
 		$more = 0;
-		cww_associate_content();
+		cww_associate_content(get_the_ID(), 'multi-full');
 	else:
-		cww_associate_content('multi');
+		cww_associate_content(get_the_ID(), 'multi');
 	endif;
 ?>
 	</div>

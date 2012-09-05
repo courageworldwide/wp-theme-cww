@@ -153,11 +153,14 @@ function cww_event_get_content( $event_id = false, $type = 'single' ) {
 		$post = get_post($after_post_id);
 	}
 	
-	if ($type == 'single') {
+	if ($type == 'single' || $type == 'multi-full') {
 		$content	= apply_filters('the_content', $post->post_content);
 	} else {
 		$content	= apply_filters('the_excerpt', $post->post_excerpt);
-		$content = $content ? $content : apply_filters('the_content', $post->post_content);
+		if ( $content )
+			$content .= ' <a href="' . get_permalink($post_id) . '">Learn more...</a>'; 
+		else
+			$content = apply_filters('the_content', $post->post_content);
 	}
 	
 	$location	= do_shortcode('[eventlocation eventid="' . $post_id . '"]');
@@ -167,14 +170,12 @@ function cww_event_get_content( $event_id = false, $type = 'single' ) {
 	$end_time	= do_shortcode('[eventendtime eventid="' . $post_id . '"]');
 	$details	= do_shortcode('[eventinfo eventid="' . $post_id . '"]');
 	$reg_btn	= do_shortcode('[eventregbtn eventid="' . $post_id . '"]Register[/eventregbtn]');
-	$result = '<div class="cww-event">';
+	$result = '<div class="cww-event ' . $type . '">';
 	
-	if ($type == 'multi' ) {
-		$result .= '<div class="cww-event-title">';
-		$result .= '<h3>';
-		$result .= '<a href="' .  get_permalink($post_id) . '">' . $post->post_title . '</a></h3>';
-		$result .= '</div>';
-	}
+	$result .= '<div class="cww-event-title">';
+	$result .= '<h3>';
+	$result .= '<a href="' .  get_permalink($post_id) . '">' . $post->post_title . '</a></h3>';
+	$result .= '</div>';
 	 
 	$result .= '<div class="cww-event-description">';
 	$result .= $content;
@@ -225,11 +226,17 @@ add_shortcode( 'events', 'cww_event_multiple_shortcode_callback' );
 function cww_event_multiple_shortcode_callback( $atts, $content = null ) {
 	$category = empty($atts['category']) ? false : $atts['category'];
 	$category = get_category_by_slug($category);
-	$args = array();
-	$args['post_type'] = 'cww_event';
+	$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+	$args = array(
+		'post_type' => 'cww_event',
+		'paged' => $paged
+	);
 	if ($category)
 		$args['category'] = $category->term_id;
 	$events = get_posts($args);
+	foreach ($events as $event) {
+		
+	}
 	$result = '';
 	foreach ( $events as $event )
 		$result .= cww_event_get_content( $event->ID, 'multi' );

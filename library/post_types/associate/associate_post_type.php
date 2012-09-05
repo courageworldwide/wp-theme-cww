@@ -27,6 +27,7 @@ $cww_associate_post_type = array(
 		'rewrite' => array('slug' => 'people','with_front' => false),
 		'public' => true,
 		'publicly_queryable' => true,
+		'taxonomies' => array( 'category', 'post_tag' ),
 		'has_archive' => true,
 		'show_in_nav_menus' => false,
 		'menu_position' => 20,
@@ -79,9 +80,13 @@ function cww_associate_register_taxonomy( ) {
 	));
 }
 
-function cww_associate_content($type = 'single') {
-	$post = $GLOBALS['post'];
-	if ( $type == 'single' ) {
+function cww_associate_content( $associate_id = false, $type = 'single' ) {
+	echo cww_associate_get_content($associate_id, $type);
+}
+
+function cww_associate_get_content( $associate_id = false, $type = 'single' ) {
+	$post = $associate_id ? get_post( $associate_id ) : $GLOBALS['post'];
+	if ( $type == 'single' || $type == 'multi-full' ) {
 		$content = apply_filters('the_content', $post->post_content);
 	} else {
 		$content = apply_filters('the_excerpt', $post->post_excerpt);
@@ -104,29 +109,25 @@ function cww_associate_content($type = 'single') {
 	} else {
 		$image = false;
 	}
-	?>
-	<div class="cww-associate">
-	 <div class="cww-associate-title">
-	  <h3><a href="<?php echo get_permalink($post->ID); ?>"><?php echo $first . ' ' . $last; ?></a></h3>
-	 </div>
-	 <div class="cww-associate-details">
-	  <?php if ( $image ) : ?>
-	  <img class="cww-associate-thumbnail thumbnail" src="<?php echo $image; ?>" />
-	  <?php endif; ?> 
-	  <p><strong>Name</strong>: <?php echo $first . ' ' . $last; ?></p>
-	  <?php if ( $org ) : ?>
-	  <p><strong>Organization</strong>: <?php echo $org; ?></p>
-	  <?php endif; ?>
-	  <?php if ( $pos ) : ?>
-	  <p><strong>Position</strong>: <?php echo $pos; ?></p>
-	  <?php endif; ?>
-	 </div>
-	 <div class="cww-associate-description">
-	  <?php echo $content; ?>
-	  <p><strong>Relationships</strong>: <?php echo $rel; ?></p>
-	 </div>
-	</div>
-	<?php
+	$result = '<div class="cww-associate">';
+	$result .= '<div class="cww-associate-title">';
+	$result .= '<h3><a href="' . get_permalink($post->ID) . $first . ' ' . $last . '</a></h3>';
+	$result .= '</div>';
+	$result .= '<div class="cww-associate-details">';
+	if ( $image )
+		$result .= '<img class="cww-associate-thumbnail thumbnail" src="' . $image . '" />';
+	$result .= '<p><strong>Name</strong>: ' . $first . ' ' . $last . '</p>';
+	if ( $org )
+		$result .= '<p><strong>Organization</strong>: ' . $org . '</p>';
+	if ( $pos )
+		$result .= '<p><strong>Position</strong>: ' . $pos . '</p>';
+	$result .= '</div>';
+	$result .= '<div class="cww-associate-description">';
+	$result .= $content;
+	$result .= '<p><strong>Relationships</strong>: ' . $rel . '</p>';
+	$result .= '</div></div>';
+	
+	return $result;
 }
 
 /************************************************************************************ 
@@ -158,4 +159,19 @@ function cww_associate_save_post( $post_id ) {
 		if ( preg_match( '/^cww_associate_.*/', $key ) )
 			update_post_meta( $post_id, $key, trim( $value ) );
 	}
+}
+
+/************************************************************************************ 
+/* Return an associate's content.
+/*
+/* @param array $atts
+/* @param string $content
+/*
+/* @return string
+/************************************************************************************/
+add_shortcode( 'associate', 'cww_associate_single_shortcode_callback' );
+function cww_associate_single_shortcode_callback( $atts, $content = null ) {
+	$associate_id = empty($atts['associateid']) ? false : $atts['associateid'];
+	$type = empty($atts['excerpt']) ? false : 'multi';
+	return cww_associate_get_content($associate_id, $type);
 }
