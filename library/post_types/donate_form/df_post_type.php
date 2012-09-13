@@ -24,6 +24,7 @@ $cww_df_post_type = array(
 		'has_archive' => false,
 		'show_in_nav_menus' => false,
 		'menu_position' => 20,
+		'taxonomies' => array('post_tag'),
 		'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'page-attributes', 'post-formats')
 	),
 	'meta_box_groups' => array(

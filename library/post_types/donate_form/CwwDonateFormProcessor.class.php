@@ -50,12 +50,21 @@ class CwwDonateFormProcessor extends FormProcessor {
 			$this->meta_data['org']				= get_bloginfo('name');
 			$this->meta_data['org_mail']		= get_bloginfo('admin_email');
 		}
-		$this->meta_data['monthly_duration'] 	= get_post_meta($this->post_id, 'cww_df_monthly_duration', true);
-		$this->meta_data['annual_duration'] 	= get_post_meta($this->post_id, 'cww_df_annual_duration', true);
-		$this->meta_data['mc_list_id']			= get_post_meta($this->post_id, 'cww_df_mc_list_id', true);
-		$this->meta_data['hr_update']			= get_post_meta($this->post_id, 'cww_df_update_hr', true);
-		$this->meta_data['conf_post_id']		= get_post_meta($this->post_id, 'cww_df_conf_post_id', true);
-		$this->meta_data['conf_mail_post_id']	= get_post_meta($this->post_id, 'cww_df_conf_mail_post_id', true);
+		
+		$meta_fields = array(
+			'monthly_duration'	=> 'cww_df_monthly_duration',
+			'annual_duration'	=> 'cww_df_annual_duration',
+			'mc_list_id'		=> 'cww_df_mc_list_id',
+			'hr_update'			=> 'cww_df_update_hr',
+			'hr_deals_admin_id'	=> 'cww_df_hr_deals_admin_id',
+			'conf_post_id'		=> 'cww_df_conf_post_id',
+			'conf_mail_post_id'	=>'cww_df_conf_mail_post_id'
+		);
+		
+		foreach ( $meta_fields as $key => $field)
+			$this->meta_data[$key] = get_post_meta($this->post_id, $field, true);
+
+		// Make sure conf_post_id and conf_mail_post_id are numeric
 		if ( !is_numeric( $this->meta_data['conf_post_id'] ) )
 			$this->meta_data['conf_post_id'] = $this->post_id;
 		if ( !is_numeric( $this->meta_data['conf_mail_post_id'] ) ) 
@@ -83,6 +92,8 @@ class CwwDonateFormProcessor extends FormProcessor {
 			$this->settings = $settings;
 		else
 			$this->settings = get_option( 'cww_df_options' );
+		if ( !empty( $this->meta_data['hr_deals_admin_id'] ) )
+			$this->settings['cww_df_highrise_setting_deals_admin_user_id'] = $this->meta_data['hr_deals_admin_id'];
 	} // end set_settings()
 	
 	/************************************************************************************ 
@@ -368,13 +379,19 @@ class CwwDonateFormProcessor extends FormProcessor {
 		if (empty($duration))
 			$duration = 0;
 		if ($type != 'onetime')
-			$start = date('m-d-Y', strtotime($this->data['donation']['start_date']));
+			$start = $this->data['donation']['start_date'];
+		$tags = array();
+		$tag_arr = wp_get_post_tags($this->post_id);
+		foreach ($tag_arr as $tag_obj) {
+			$tags[] = $tag_obj->name;
+		}
 		$hr_transaction	= array(
 			'id' => (isset($this->data['donation']['transaction_id']) ? $this->data['donation']['transaction_id'] : $this->data['donation']['subscription_id']),
 			'source' => $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
 			'pay_method' => $this->card_type($this->data['card']['num']),
 			'card_exp' => $this->data['card']['exp'],
 			'account' => 'Auth.net',
+			'tags' => $tags,
 			'products' => array(
 				0 => array(
 					'amount' => $this->data['donation']['amount'],

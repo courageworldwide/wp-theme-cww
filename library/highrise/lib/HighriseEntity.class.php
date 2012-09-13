@@ -164,7 +164,6 @@
 					 	
 						if ($this->debug)
 							print "Adding Tag: " . $tag->getName() . "\n";
-
 						$new_tag_data = $this->postDataWithVerb("/" . $this->url_base . "/" . $this->getId() . "/tags.xml", "<name>" . $tag->getName() . "</name>", "POST");
 						$this->checkForErrors($this->errorcheck . " (add tag)", array(200, 201));
 						$new_tag_data = simplexml_load_string($new_tag_data);

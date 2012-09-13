@@ -70,6 +70,17 @@ function cww_df_meta_boxes($mailchimp = false, $highrise = false) {
 				'default'	=> '1',
 			)
 		);
+		
+		// Highrise Deals Admin Group ID
+		$meta_boxes['cww_df_settings']['cww_df_hr_deals_admin_id'] = array(
+			'handle'	=> 'cww_df_hr_deals_admin_id',
+			'title' 	=> __('Highrise Deals Administrator ID'),
+			'args'		=> array(
+				'type' 		=> 'text',
+				'desc' 		=> __("Please enter the ID of the Highrise user responsible for Deals made using this form.  Leave blank to use the general donation form setting.", 'cww'),
+				'default' 	=> '',
+			)
+		);
 	}
 	
 	return $meta_boxes;

@@ -111,7 +111,7 @@ function cww_associate_get_content( $associate_id = false, $type = 'single' ) {
 	}
 	$result = '<div class="cww-associate">';
 	$result .= '<div class="cww-associate-title">';
-	$result .= '<h3><a href="' . get_permalink($post->ID) . $first . ' ' . $last . '</a></h3>';
+	$result .= '<h3><a href="' . get_permalink($post->ID) . '">' . $first . ' ' . $last . '</a></h3>';
 	$result .= '</div>';
 	$result .= '<div class="cww-associate-details">';
 	if ( $image )

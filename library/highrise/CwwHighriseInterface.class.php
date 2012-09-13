@@ -160,6 +160,15 @@ class CwwHighriseInterface {
 			}
 			$deal_name = implode(' | ', $deal_name_parts);
 			$result[$i]['deal'] = $this->addDeal($deal_name, $product, $person);
+			$deal = $result[$i]['deal'];
+			
+			// - Tags
+			if (!empty($tags)) {
+				foreach ($tags as $tag) {
+					$this->addTag($tag, $person->id, 'Person');
+					$this->addTag($tag, $deal->id, 'Deal');
+				}
+			}
 			
 			// - Note 
 			$name 				= $person->getFirstName() . ' ' . $person->getLastName();
@@ -172,8 +181,9 @@ class CwwHighriseInterface {
 				else
 					$start_date = date('n-d-Y');
 			} else {
-				$start_date = $product['start_date'];
+				$start_date = date('m-d-Y', strtotime($product['start_date']));
 			}
+			$deal_link = '<a href="https://' . $this->_hr->account . 'highrisehq.com/deals/' . $deal->id . '">' . $deal->id . '</a>';
 			$note_body_parts  = array(
 				"Site" => $url,
 				"Name" => $name,
@@ -182,14 +192,15 @@ class CwwHighriseInterface {
 				"Date and Time" => $datetime,
 				"Start date" => $start_date,
 				"Item" => $product_name,
-				"Quantity" => $product_quantity
+				"Quantity" => $product_quantity,
+				"Deal" => $deal_link,
 			);
 			$note_body = array("Donation form");
 			foreach ($note_body_parts as $key => $val) {
 				if ($val)
 					$note_body[] = "$key: $val";
 			}
-			$result[$i]['note'] = $this->addNote(implode(', ', $note_body), $person);
+			$result[$i]['note'] = $this->addNote(implode(' | ', $note_body), $person);
 			
 			// - Task
 			$task_delay	= $this->_config['task_delay'];
@@ -339,6 +350,17 @@ class CwwHighriseInterface {
 		$deal->save();
 		return $deal;
 	} // end addDeal
+	
+	
+	/****************************************************************************************
+	 * Add a Highrise tag
+	/****************************************************************************************/
+	public function addTag($tag, $subject_id, $subject_type) {
+		$tag = new HighriseTag(null, $tag, $subject_type);
+		$tag->setHighrise($this->_hr);
+		$tag->setSubjectId($subject_id);
+		$tag->save();
+	}
 	
 	/****************************************************************************************
 	 * Add a Highrise task associatied with a deal

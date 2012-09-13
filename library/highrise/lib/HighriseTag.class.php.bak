@@ -1,13 +1,11 @@
 <?php
 	
-	class HighriseTag extends HighriseAPI
+	class HighriseTag
 	{
 
 		protected $_tag_type;
-		protected $_hr;
 
 		public $id;
-		public $subject_id;
 		public $name;
 		public $deleted;
 		
@@ -25,6 +23,8 @@
 		{
 
 			$xml = new SimpleXMLElement("<tag></tag>");
+			$xml->addChild("id",$this->getId());
+			$xml->id->addAttribute("type","integer");
 			$xml->addChild("name",$this->getName());
 			return $xml->asXML();
 		}
@@ -33,13 +33,12 @@
 		{
 			return $this->name;
 		}
-		public function setHighrise(HighriseAPI $hr) {
-			$this->_hr = $hr;
-		}
+			
 		public function setName($name)
 		{
 			$this->name = (string)$name;
 		}
+
 		public function getName()
 		{
 			return $this->name;
@@ -53,16 +52,6 @@
 		public function getId()
 		{
 			return $this->id;
-		}
-		
-		public function setSubjectId($id)
-		{
-			$this->subject_id = (string)$id;
-		}
-
-		public function getSubjectId()
-		{
-			return $this->subject_id;
 		}
 
 		public function setType($type) {
@@ -83,11 +72,6 @@
 				default:
 					throw new Exception("'$type' is not a valid status type. Available status names: Person, Company, Kase, Deal");
 			};
-		}
-		
-		public function save()
-		{
-			return $this->_hr->postDataWithVerb("/" . $this->_tag_type . "/" . $this->getSubjectId() . "/tags.xml", "<name>" . $this->getName() . "</name>", "POST");
 		}
 
 		public function delete($subject_id) {
