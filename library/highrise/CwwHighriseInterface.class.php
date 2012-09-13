@@ -166,13 +166,13 @@ class CwwHighriseInterface {
 			$product_type 		= ucfirst($product['type']) . ' Donation';
 			$product_category 	= isset($product['category']) ? $product['category'] : 'General donation';
 			$datetime			= date('n-d-Y H:i');
-			if (!(isset($product['start_date'])) || !$product['start_date']) {
+			if (empty($product['start_date'])) {
 				if ($product['type'] == 'onetime')
 					$start_date = false;
 				else
 					$start_date = date('n-d-Y');
 			} else {
-				$start_date = false;
+				$start_date = $product['start_date'];
 			}
 			$note_body_parts  = array(
 				"Site" => $url,
@@ -184,7 +184,7 @@ class CwwHighriseInterface {
 				"Item" => $product_name,
 				"Quantity" => $product_quantity
 			);
-			$note_body = array("Online Donation");
+			$note_body = array("Donation form");
 			foreach ($note_body_parts as $key => $val) {
 				if ($val)
 					$note_body[] = "$key: $val";

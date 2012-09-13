@@ -85,8 +85,6 @@ class CwwSettingsEngine {
 	public function register_settings( $validation_callback = false ) {
 		$validation_callback = $validation_callback ? $validation_callback : array( &$this, 'validation_callback' );
 		$option_name = $this->_settings['slug']; 
-		// register_setting( $option_group, $option_name, $sanitize_callback );  
-		register_setting($option_name, $option_name, $validation_callback);
 		// Sections  
 	    // add_settings_section( $id, $title, $callback, $page );  
 	    if(!empty($this->_settings['sections'])){  
@@ -102,6 +100,8 @@ class CwwSettingsEngine {
 	            $this->create_settings_field($option);  
 	        }  
 	    }
+	    // register_setting( $option_group, $option_name, $sanitize_callback );  
+		register_setting($option_name, $option_name, $validation_callback);
 	}
 	
 	/************************************************************************************

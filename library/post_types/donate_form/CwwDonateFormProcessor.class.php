@@ -368,7 +368,7 @@ class CwwDonateFormProcessor extends FormProcessor {
 		if (empty($duration))
 			$duration = 0;
 		if ($type != 'onetime')
-			$start = $this->data['donation']['start_date'];
+			$start = date('m-d-Y', strtotime($this->data['donation']['start_date']));
 		$hr_transaction	= array(
 			'id' => (isset($this->data['donation']['transaction_id']) ? $this->data['donation']['transaction_id'] : $this->data['donation']['subscription_id']),
 			'source' => $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
